@@ -1,0 +1,25 @@
+# Se generan con tool/bootstrap.py
+/android/
+/ios/
+/packages/mirasol_light/
+/web/
+/linux/
+/macos/
+/windows/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+build/
+pubspec.lock
+*.iml
+.idea/
+.vscode/
+
+# Claves de firma: no subir nunca
+*.jks
+*.keystore
+key.properties

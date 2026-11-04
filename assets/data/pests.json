@@ -1,0 +1,584 @@
+{
+ "version": 1,
+ "pests": [
+  {
+   "id": "cochinilla",
+   "names": {
+    "es": [
+     "Cochinilla algodonosa"
+    ],
+    "it": [
+     "Cocciniglia cotonosa"
+    ]
+   },
+   "where": "leaf",
+   "signs": {
+    "es": "Masas blancas algodonosas en las axilas y el envés de las hojas, y residuo pegajoso.",
+    "it": "Masse bianche cotonose nelle ascelle e sul lato inferiore delle foglie, con residuo appiccicoso."
+   },
+   "prevention": {
+    "es": "Revisar las axilas al regar y dejar 2 semanas en cuarentena las plantas nuevas.",
+    "it": "Controllare le ascelle delle foglie quando si annaffia e tenere 2 settimane in quarantena le piante nuove."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Aislar la planta y quitar las visibles con un hisopo en alcohol isopropílico al 70 %",
+      "it": "Isolare la pianta e rimuovere le cocciniglie visibili con un cotton fioc con alcol isopropilico al 70%"
+     }
+    },
+    {
+     "day": 7,
+     "final": false,
+     "text": {
+      "es": "Pulverizar jabón potásico y revisar las axilas",
+      "it": "Nebulizzare sapone potassico e controllare le ascelle delle foglie"
+     }
+    },
+    {
+     "day": 14,
+     "final": false,
+     "text": {
+      "es": "Pulverizar jabón potásico y revisar las axilas",
+      "it": "Nebulizzare sapone potassico e controllare le ascelle delle foglie"
+     }
+    },
+    {
+     "day": 21,
+     "final": false,
+     "text": {
+      "es": "Pulverizar jabón potásico y revisar las axilas",
+      "it": "Nebulizzare sapone potassico e controllare le ascelle delle foglie"
+     }
+    },
+    {
+     "day": 28,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿quedan restos?",
+      "it": "Controllo finale: restano tracce?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "trips",
+   "names": {
+    "es": [
+     "Trips"
+    ],
+    "it": [
+     "Tripidi"
+    ]
+   },
+   "where": "leaf",
+   "signs": {
+    "es": "Rayas plateadas en las hojas, puntos negros y brotes o flores deformes.",
+    "it": "Striature argentate sulle foglie, puntini neri e germogli o fiori deformati."
+   },
+   "prevention": {
+    "es": "Mantener buena ventilación y revisar flores y brotes nuevos.",
+    "it": "Garantire una buona ventilazione e controllare fiori e germogli nuovi."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Aislar la planta y colocar trampas azules pegajosas",
+      "it": "Isolare la pianta e posizionare trappole cromotropiche blu"
+     }
+    },
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Primera aplicación de jabón potásico",
+      "it": "Prima applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 5,
+     "final": false,
+     "text": {
+      "es": "Segunda aplicación de jabón potásico",
+      "it": "Seconda applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 10,
+     "final": false,
+     "text": {
+      "es": "Tercera aplicación de jabón potásico",
+      "it": "Terza applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 17,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿hay rayas plateadas nuevas?",
+      "it": "Controllo finale: ci sono nuove striature argentate?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "acaros",
+   "names": {
+    "es": [
+     "Ácaros (araña roja)"
+    ],
+    "it": [
+     "Acari (ragnetto rosso)"
+    ]
+   },
+   "where": "leaf",
+   "signs": {
+    "es": "Puntitos amarillos en las hojas y telarañas finas en el envés, sobre todo con aire seco.",
+    "it": "Puntini gialli sulle foglie e sottili ragnatele sul lato inferiore, soprattutto con aria secca."
+   },
+   "prevention": {
+    "es": "Evitar ambientes muy secos y limpiar las hojas con un paño húmedo.",
+    "it": "Evitare ambienti molto secchi e pulire le foglie con un panno umido."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Dar una ducha a las hojas y subir la humedad del ambiente",
+      "it": "Lavare le foglie con una doccia e aumentare l'umidità dell'ambiente"
+     }
+    },
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Primera aplicación de jabón potásico",
+      "it": "Prima applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 5,
+     "final": false,
+     "text": {
+      "es": "Segunda aplicación de jabón potásico",
+      "it": "Seconda applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 10,
+     "final": false,
+     "text": {
+      "es": "Tercera aplicación de jabón potásico",
+      "it": "Terza applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 17,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿quedan telarañas?",
+      "it": "Controllo finale: restano ragnatele?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "mosquito",
+   "names": {
+    "es": [
+     "Mosquito del sustrato"
+    ],
+    "it": [
+     "Moscerini del terriccio"
+    ]
+   },
+   "where": "soil",
+   "signs": {
+    "es": "Mosquitas pequeñas que vuelan al regar y larvas en el sustrato siempre húmedo.",
+    "it": "Piccoli moscerini che volano quando si annaffia e larve nel terriccio sempre umido."
+   },
+   "prevention": {
+    "es": "Evitar platos con agua estancada y sustratos que retienen demasiada humedad.",
+    "it": "Evitare sottovasi con acqua stagnante e terricci che trattengono troppa umidità."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Dejar secar 3 a 5 cm de sustrato y colocar trampas amarillas",
+      "it": "Lasciare asciugare 3-5 cm di terriccio e posizionare trappole cromotropiche gialle"
+     }
+    },
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Regar con Bacillus thuringiensis israelensis (BTI)",
+      "it": "Annaffiare con Bacillus thuringiensis israelensis (BTI)"
+     }
+    },
+    {
+     "day": 7,
+     "final": false,
+     "text": {
+      "es": "Cambiar las trampas y repetir el BTI",
+      "it": "Sostituire le trappole e ripetere il BTI"
+     }
+    },
+    {
+     "day": 14,
+     "final": false,
+     "text": {
+      "es": "Revisar si siguen apareciendo mosquitas",
+      "it": "Controllare se compaiono ancora moscerini"
+     }
+    },
+    {
+     "day": 21,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿siguen las mosquitas?",
+      "it": "Controllo finale: ci sono ancora moscerini?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "pulgon",
+   "names": {
+    "es": [
+     "Pulgón"
+    ],
+    "it": [
+     "Afidi"
+    ]
+   },
+   "where": "shoot",
+   "signs": {
+    "es": "Colonias verdes o negras en los brotes tiernos, residuo pegajoso y a veces hormigas.",
+    "it": "Colonie verdi o nere sui germogli teneri, residuo appiccicoso e talvolta formiche."
+   },
+   "prevention": {
+    "es": "Revisar los brotes nuevos y controlar a las hormigas.",
+    "it": "Controllare i germogli nuovi e tenere sotto controllo le formiche."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Quitarlos con un chorro de agua y aplicar jabón potásico",
+      "it": "Rimuoverli con un getto d'acqua e applicare sapone potassico"
+     }
+    },
+    {
+     "day": 5,
+     "final": false,
+     "text": {
+      "es": "Segunda aplicación y control de hormigas",
+      "it": "Seconda applicazione e controllo delle formiche"
+     }
+    },
+    {
+     "day": 10,
+     "final": false,
+     "text": {
+      "es": "Tercera aplicación de jabón potásico",
+      "it": "Terza applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 17,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿quedan colonias?",
+      "it": "Controllo finale: restano colonie?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "mosca_blanca",
+   "names": {
+    "es": [
+     "Mosca blanca"
+    ],
+    "it": [
+     "Mosca bianca"
+    ]
+   },
+   "where": "leaf",
+   "signs": {
+    "es": "Insectos blancos diminutos que vuelan al mover la planta y residuo pegajoso en el envés.",
+    "it": "Minuscoli insetti bianchi che volano quando si scuote la pianta e residuo appiccicoso sul lato inferiore."
+   },
+   "prevention": {
+    "es": "Revisar el envés de las hojas y no apiñar las plantas.",
+    "it": "Controllare il lato inferiore delle foglie e non affollare le piante."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Colocar trampas amarillas y lavar el envés de las hojas con agua",
+      "it": "Posizionare trappole gialle e lavare con acqua il lato inferiore delle foglie"
+     }
+    },
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Primera aplicación de jabón potásico",
+      "it": "Prima applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 5,
+     "final": false,
+     "text": {
+      "es": "Segunda aplicación de jabón potásico",
+      "it": "Seconda applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 10,
+     "final": false,
+     "text": {
+      "es": "Tercera aplicación de jabón potásico",
+      "it": "Terza applicazione di sapone potassico"
+     }
+    },
+    {
+     "day": 17,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿siguen volando?",
+      "it": "Controllo finale: volano ancora?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "caparazon",
+   "names": {
+    "es": [
+     "Cochinilla de caparazón"
+    ],
+    "it": [
+     "Cocciniglia a scudetto"
+    ]
+   },
+   "where": "shoot",
+   "signs": {
+    "es": "Pequeños escudos marrones adheridos a tallos y hojas, y residuo pegajoso.",
+    "it": "Piccoli scudetti marroni attaccati a fusti e foglie, con residuo appiccicoso."
+   },
+   "prevention": {
+    "es": "Revisar los tallos de las plantas nuevas antes de sumarlas a la colección.",
+    "it": "Controllare i fusti delle piante nuove prima di aggiungerle alla collezione."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Aislar la planta y retirar los escudos a mano o con un hisopo en alcohol",
+      "it": "Isolare la pianta e rimuovere gli scudetti a mano o con un cotton fioc con alcol"
+     }
+    },
+    {
+     "day": 7,
+     "final": false,
+     "text": {
+      "es": "Pulverizar jabón potásico y retirar los que queden",
+      "it": "Nebulizzare sapone potassico e rimuovere quelli rimasti"
+     }
+    },
+    {
+     "day": 14,
+     "final": false,
+     "text": {
+      "es": "Pulverizar jabón potásico y retirar los que queden",
+      "it": "Nebulizzare sapone potassico e rimuovere quelli rimasti"
+     }
+    },
+    {
+     "day": 21,
+     "final": false,
+     "text": {
+      "es": "Pulverizar jabón potásico y retirar los que queden",
+      "it": "Nebulizzare sapone potassico e rimuovere quelli rimasti"
+     }
+    },
+    {
+     "day": 28,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿quedan escudos?",
+      "it": "Controllo finale: restano scudetti?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "oidio",
+   "names": {
+    "es": [
+     "Oídio"
+    ],
+    "it": [
+     "Oidio (mal bianco)"
+    ]
+   },
+   "where": "leaf",
+   "signs": {
+    "es": "Polvillo blanco sobre hojas y tallos, a menudo con poca ventilación.",
+    "it": "Polverina bianca su foglie e fusti, spesso con scarsa ventilazione."
+   },
+   "prevention": {
+    "es": "Evitar mojar las hojas y asegurar buena ventilación.",
+    "it": "Evitare di bagnare le foglie e garantire una buona ventilazione."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Aislar la planta, cortar las hojas más afectadas y mejorar la ventilación",
+      "it": "Isolare la pianta, tagliare le foglie più colpite e migliorare la ventilazione"
+     }
+    },
+    {
+     "day": 7,
+     "final": false,
+     "text": {
+      "es": "Aplicar un fungicida apto para plantas de interior, siguiendo la etiqueta",
+      "it": "Applicare un fungicida adatto alle piante da appartamento, seguendo l'etichetta"
+     }
+    },
+    {
+     "day": 14,
+     "final": false,
+     "text": {
+      "es": "Repetir la aplicación si la etiqueta lo indica",
+      "it": "Ripetere l'applicazione se indicato dall'etichetta"
+     }
+    },
+    {
+     "day": 21,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿reaparece el polvillo?",
+      "it": "Controllo finale: riappare la polverina?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  },
+  {
+   "id": "babosas",
+   "names": {
+    "es": [
+     "Babosas y caracoles"
+    ],
+    "it": [
+     "Lumache e limacce"
+    ]
+   },
+   "where": "all",
+   "signs": {
+    "es": "Hojas con bordes comidos y rastros plateados, sobre todo en balcones y terrazas.",
+    "it": "Foglie con bordi rosicchiati e scie argentate, soprattutto su balconi e terrazze."
+   },
+   "prevention": {
+    "es": "Mantener el balcón limpio y sin refugios húmedos.",
+    "it": "Tenere il balcone pulito e senza rifugi umidi."
+   },
+   "petNote": {
+    "es": "Con mascotas: evitar aceites esenciales y neem (pueden ser tóxicos para los gatos) y mantener la planta fuera de su alcance hasta que seque.",
+    "it": "Con animali domestici: evitare oli essenziali e neem (possono essere tossici per i gatti) e tenere la pianta fuori portata finché non è asciutta."
+   },
+   "tasks": [
+    {
+     "day": 0,
+     "final": false,
+     "text": {
+      "es": "Retirar a mano al atardecer y revisar debajo de las macetas",
+      "it": "Rimuovere a mano al tramonto e controllare sotto i vasi"
+     }
+    },
+    {
+     "day": 3,
+     "final": false,
+     "text": {
+      "es": "Repetir la recolección y colocar barreras alrededor de la maceta",
+      "it": "Ripetere la raccolta e posizionare barriere attorno al vaso"
+     }
+    },
+    {
+     "day": 7,
+     "final": false,
+     "text": {
+      "es": "Repetir la recolección",
+      "it": "Ripetere la raccolta"
+     }
+    },
+    {
+     "day": 14,
+     "final": true,
+     "text": {
+      "es": "Revisión final: ¿hay hojas nuevas comidas?",
+      "it": "Controllo finale: ci sono nuove foglie rosicchiate?"
+     }
+    }
+   ],
+   "confidence": "draft"
+  }
+ ]
+}

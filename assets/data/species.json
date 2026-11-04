@@ -1,0 +1,960 @@
+{
+ "version": 1,
+ "species": [
+  {
+   "id": "monstera_deliciosa",
+   "scientific": "Monstera deliciosa",
+   "names": {
+    "es": [
+     "Costilla de Adán",
+     "Monstera"
+    ],
+    "it": [
+     "Monstera",
+     "Costola di Adamo"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 15,
+   "waterDays": 7,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "epipremnum_aureum",
+   "scientific": "Epipremnum aureum",
+   "names": {
+    "es": [
+     "Potus",
+     "Pothos"
+    ],
+    "it": [
+     "Pothos"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 10,
+   "waterDays": 7,
+   "tempMin": 12,
+   "humidityMin": 40,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "dracaena_trifasciata",
+   "scientific": "Dracaena trifasciata",
+   "names": {
+    "es": [
+     "Lengua de suegra",
+     "Sansevieria"
+    ],
+    "it": [
+     "Sansevieria",
+     "Lingua di suocera"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 2,
+   "dliMax": 15,
+   "waterDays": 14,
+   "tempMin": 10,
+   "humidityMin": 30,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "echeveria_elegans",
+   "scientific": "Echeveria elegans",
+   "names": {
+    "es": [
+     "Echeveria"
+    ],
+    "it": [
+     "Echeveria"
+    ]
+   },
+   "place": "both",
+   "dliMin": 15,
+   "dliMax": 30,
+   "waterDays": 14,
+   "tempMin": 5,
+   "humidityMin": 20,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "aloe_vera",
+   "scientific": "Aloe vera",
+   "names": {
+    "es": [
+     "Aloe vera",
+     "Sábila"
+    ],
+    "it": [
+     "Aloe vera"
+    ]
+   },
+   "place": "both",
+   "dliMin": 14,
+   "dliMax": 30,
+   "waterDays": 14,
+   "tempMin": 8,
+   "humidityMin": 20,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "chlorophytum_comosum",
+   "scientific": "Chlorophytum comosum",
+   "names": {
+    "es": [
+     "Cinta",
+     "Mala madre"
+    ],
+    "it": [
+     "Falangio",
+     "Pianta ragno"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 14,
+   "waterDays": 7,
+   "tempMin": 10,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "calathea_orbifolia",
+   "scientific": "Calathea orbifolia",
+   "names": {
+    "es": [
+     "Calathea"
+    ],
+    "it": [
+     "Calathea"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 10,
+   "waterDays": 6,
+   "tempMin": 16,
+   "humidityMin": 55,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "peperomia_obtusifolia",
+   "scientific": "Peperomia obtusifolia",
+   "names": {
+    "es": [
+     "Peperomia"
+    ],
+    "it": [
+     "Peperomia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 12,
+   "waterDays": 10,
+   "tempMin": 12,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "nephrolepis_exaltata",
+   "scientific": "Nephrolepis exaltata",
+   "names": {
+    "es": [
+     "Helecho de Boston"
+    ],
+    "it": [
+     "Felce di Boston"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 10,
+   "waterDays": 4,
+   "tempMin": 12,
+   "humidityMin": 60,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "ficus_lyrata",
+   "scientific": "Ficus lyrata",
+   "names": {
+    "es": [
+     "Ficus lira"
+    ],
+    "it": [
+     "Ficus lyrata",
+     "Fico lira"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 10,
+   "dliMax": 20,
+   "waterDays": 8,
+   "tempMin": 12,
+   "humidityMin": 40,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "ficus_elastica",
+   "scientific": "Ficus elastica",
+   "names": {
+    "es": [
+     "Gomero",
+     "Ficus elástica"
+    ],
+    "it": [
+     "Albero della gomma",
+     "Ficus elastica"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 20,
+   "waterDays": 8,
+   "tempMin": 10,
+   "humidityMin": 40,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "philodendron_hederaceum",
+   "scientific": "Philodendron hederaceum",
+   "names": {
+    "es": [
+     "Filodendro de hoja de corazón"
+    ],
+    "it": [
+     "Filodendro",
+     "Philodendron"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 12,
+   "waterDays": 7,
+   "tempMin": 15,
+   "humidityMin": 45,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "zamioculcas_zamiifolia",
+   "scientific": "Zamioculcas zamiifolia",
+   "names": {
+    "es": [
+     "Zamioculcas",
+     "Planta ZZ"
+    ],
+    "it": [
+     "Zamioculcas",
+     "Pianta ZZ"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 2,
+   "dliMax": 10,
+   "waterDays": 18,
+   "tempMin": 12,
+   "humidityMin": 30,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "spathiphyllum_wallisii",
+   "scientific": "Spathiphyllum wallisii",
+   "names": {
+    "es": [
+     "Cuna de Moisés",
+     "Espatifilo"
+    ],
+    "it": [
+     "Giglio della pace",
+     "Spatifillo"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 3,
+   "dliMax": 9,
+   "waterDays": 6,
+   "tempMin": 13,
+   "humidityMin": 50,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "dieffenbachia_seguine",
+   "scientific": "Dieffenbachia seguine",
+   "names": {
+    "es": [
+     "Dieffenbachia"
+    ],
+    "it": [
+     "Dieffenbachia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 5,
+   "dliMax": 12,
+   "waterDays": 7,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "crassula_ovata",
+   "scientific": "Crassula ovata",
+   "names": {
+    "es": [
+     "Árbol de jade"
+    ],
+    "it": [
+     "Albero di giada",
+     "Crassula"
+    ]
+   },
+   "place": "both",
+   "dliMin": 14,
+   "dliMax": 25,
+   "waterDays": 14,
+   "tempMin": 5,
+   "humidityMin": 20,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "haworthia_attenuata",
+   "scientific": "Haworthia attenuata",
+   "names": {
+    "es": [
+     "Haworthia"
+    ],
+    "it": [
+     "Haworthia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 15,
+   "waterDays": 14,
+   "tempMin": 8,
+   "humidityMin": 20,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "dypsis_lutescens",
+   "scientific": "Dypsis lutescens",
+   "names": {
+    "es": [
+     "Palma areca"
+    ],
+    "it": [
+     "Palma areca"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 18,
+   "waterDays": 7,
+   "tempMin": 12,
+   "humidityMin": 45,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "chamaedorea_elegans",
+   "scientific": "Chamaedorea elegans",
+   "names": {
+    "es": [
+     "Palma de salón"
+    ],
+    "it": [
+     "Palma da salotto",
+     "Camedorea"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 10,
+   "waterDays": 7,
+   "tempMin": 12,
+   "humidityMin": 45,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "phalaenopsis",
+   "scientific": "Phalaenopsis",
+   "names": {
+    "es": [
+     "Orquídea mariposa",
+     "Orquídea"
+    ],
+    "it": [
+     "Orchidea",
+     "Phalaenopsis"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 10,
+   "waterDays": 7,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "saintpaulia_ionantha",
+   "scientific": "Saintpaulia ionantha",
+   "names": {
+    "es": [
+     "Violeta africana"
+    ],
+    "it": [
+     "Violetta africana"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 5,
+   "dliMax": 10,
+   "waterDays": 6,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "schlumbergera_truncata",
+   "scientific": "Schlumbergera truncata",
+   "names": {
+    "es": [
+     "Cactus de Navidad"
+    ],
+    "it": [
+     "Cactus di Natale"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 14,
+   "waterDays": 10,
+   "tempMin": 10,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "aspidistra_elatior",
+   "scientific": "Aspidistra elatior",
+   "names": {
+    "es": [
+     "Aspidistra"
+    ],
+    "it": [
+     "Aspidistra"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 1,
+   "dliMax": 6,
+   "waterDays": 10,
+   "tempMin": 5,
+   "humidityMin": 30,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "fittonia_albivenis",
+   "scientific": "Fittonia albivenis",
+   "names": {
+    "es": [
+     "Fittonia"
+    ],
+    "it": [
+     "Fittonia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 3,
+   "dliMax": 8,
+   "waterDays": 4,
+   "tempMin": 15,
+   "humidityMin": 60,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "hoya_carnosa",
+   "scientific": "Hoya carnosa",
+   "names": {
+    "es": [
+     "Flor de cera"
+    ],
+    "it": [
+     "Fiore di cera",
+     "Hoya"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 20,
+   "waterDays": 12,
+   "tempMin": 12,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "senecio_rowleyanus",
+   "scientific": "Senecio rowleyanus",
+   "names": {
+    "es": [
+     "Rosario",
+     "Collar de perlas"
+    ],
+    "it": [
+     "Rosario",
+     "Filo di perle"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 14,
+   "dliMax": 25,
+   "waterDays": 14,
+   "tempMin": 8,
+   "humidityMin": 25,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "aglaonema_commutatum",
+   "scientific": "Aglaonema commutatum",
+   "names": {
+    "es": [
+     "Aglaonema"
+    ],
+    "it": [
+     "Aglaonema"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 3,
+   "dliMax": 9,
+   "waterDays": 8,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "codiaeum_variegatum",
+   "scientific": "Codiaeum variegatum",
+   "names": {
+    "es": [
+     "Croton"
+    ],
+    "it": [
+     "Croton",
+     "Codiaeum"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 14,
+   "dliMax": 25,
+   "waterDays": 7,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "dracaena_marginata",
+   "scientific": "Dracaena marginata",
+   "names": {
+    "es": [
+     "Drácena"
+    ],
+    "it": [
+     "Dracena",
+     "Dracaena marginata"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 16,
+   "waterDays": 10,
+   "tempMin": 12,
+   "humidityMin": 35,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "yucca_elephantipes",
+   "scientific": "Yucca elephantipes",
+   "names": {
+    "es": [
+     "Yuca de interior"
+    ],
+    "it": [
+     "Yucca"
+    ]
+   },
+   "place": "both",
+   "dliMin": 12,
+   "dliMax": 25,
+   "waterDays": 12,
+   "tempMin": 5,
+   "humidityMin": 25,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "cyclamen_persicum",
+   "scientific": "Cyclamen persicum",
+   "names": {
+    "es": [
+     "Ciclamen"
+    ],
+    "it": [
+     "Ciclamino"
+    ]
+   },
+   "place": "both",
+   "dliMin": 8,
+   "dliMax": 14,
+   "waterDays": 5,
+   "tempMin": 5,
+   "humidityMin": 45,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "begonia_rex",
+   "scientific": "Begonia rex",
+   "names": {
+    "es": [
+     "Begonia"
+    ],
+    "it": [
+     "Begonia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 16,
+   "waterDays": 6,
+   "tempMin": 13,
+   "humidityMin": 55,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "anthurium_andraeanum",
+   "scientific": "Anthurium andraeanum",
+   "names": {
+    "es": [
+     "Anturio"
+    ],
+    "it": [
+     "Anthurium",
+     "Anturio"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 14,
+   "waterDays": 6,
+   "tempMin": 15,
+   "humidityMin": 55,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "tradescantia_zebrina",
+   "scientific": "Tradescantia zebrina",
+   "names": {
+    "es": [
+     "Amor de hombre",
+     "Tradescantia"
+    ],
+    "it": [
+     "Tradescantia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 15,
+   "waterDays": 6,
+   "tempMin": 10,
+   "humidityMin": 40,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "guzmania",
+   "scientific": "Guzmania",
+   "names": {
+    "es": [
+     "Bromelia"
+    ],
+    "it": [
+     "Bromelia",
+     "Guzmania"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 16,
+   "waterDays": 7,
+   "tempMin": 15,
+   "humidityMin": 50,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "tillandsia",
+   "scientific": "Tillandsia",
+   "names": {
+    "es": [
+     "Clavel del aire",
+     "Tillandsia"
+    ],
+    "it": [
+     "Tillandsia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 16,
+   "waterDays": 5,
+   "tempMin": 10,
+   "humidityMin": 50,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "pachira_aquatica",
+   "scientific": "Pachira aquatica",
+   "names": {
+    "es": [
+     "Árbol del dinero",
+     "Pachira"
+    ],
+    "it": [
+     "Pachira",
+     "Albero del denaro"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 18,
+   "waterDays": 10,
+   "tempMin": 12,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "maranta_leuconeura",
+   "scientific": "Maranta leuconeura",
+   "names": {
+    "es": [
+     "Maranta",
+     "Planta de la oración"
+    ],
+    "it": [
+     "Maranta"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 4,
+   "dliMax": 10,
+   "waterDays": 6,
+   "tempMin": 15,
+   "humidityMin": 55,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "pilea_peperomioides",
+   "scientific": "Pilea peperomioides",
+   "names": {
+    "es": [
+     "Pilea",
+     "Planta del dinero chino"
+    ],
+    "it": [
+     "Pilea"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 6,
+   "dliMax": 14,
+   "waterDays": 8,
+   "tempMin": 10,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "alocasia_amazonica",
+   "scientific": "Alocasia × amazonica",
+   "names": {
+    "es": [
+     "Alocasia"
+    ],
+    "it": [
+     "Alocasia"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 8,
+   "dliMax": 18,
+   "waterDays": 6,
+   "tempMin": 16,
+   "humidityMin": 55,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "strelitzia_reginae",
+   "scientific": "Strelitzia reginae",
+   "names": {
+    "es": [
+     "Ave del paraíso"
+    ],
+    "it": [
+     "Strelitzia",
+     "Uccello del paradiso"
+    ]
+   },
+   "place": "both",
+   "dliMin": 15,
+   "dliMax": 30,
+   "waterDays": 7,
+   "tempMin": 8,
+   "humidityMin": 40,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "beaucarnea_recurvata",
+   "scientific": "Beaucarnea recurvata",
+   "names": {
+    "es": [
+     "Pata de elefante"
+    ],
+    "it": [
+     "Beaucarnea",
+     "Palma elefante"
+    ]
+   },
+   "place": "indoor",
+   "dliMin": 14,
+   "dliMax": 25,
+   "waterDays": 14,
+   "tempMin": 8,
+   "humidityMin": 25,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "ocimum_basilicum",
+   "scientific": "Ocimum basilicum",
+   "names": {
+    "es": [
+     "Albahaca"
+    ],
+    "it": [
+     "Basilico"
+    ]
+   },
+   "place": "both",
+   "dliMin": 20,
+   "dliMax": 30,
+   "waterDays": 3,
+   "tempMin": 10,
+   "humidityMin": 40,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "mentha",
+   "scientific": "Mentha",
+   "names": {
+    "es": [
+     "Menta"
+    ],
+    "it": [
+     "Menta"
+    ]
+   },
+   "place": "both",
+   "dliMin": 12,
+   "dliMax": 20,
+   "waterDays": 3,
+   "tempMin": 0,
+   "humidityMin": 40,
+   "toxicToPets": true,
+   "confidence": "draft"
+  },
+  {
+   "id": "rosmarinus_officinalis",
+   "scientific": "Rosmarinus officinalis",
+   "names": {
+    "es": [
+     "Romero"
+    ],
+    "it": [
+     "Rosmarino"
+    ]
+   },
+   "place": "both",
+   "dliMin": 20,
+   "dliMax": 30,
+   "waterDays": 10,
+   "tempMin": -5,
+   "humidityMin": 30,
+   "toxicToPets": false,
+   "confidence": "draft"
+  },
+  {
+   "id": "lavandula_angustifolia",
+   "scientific": "Lavandula angustifolia",
+   "names": {
+    "es": [
+     "Lavanda"
+    ],
+    "it": [
+     "Lavanda"
+    ]
+   },
+   "place": "both",
+   "dliMin": 20,
+   "dliMax": 35,
+   "waterDays": 10,
+   "tempMin": -5,
+   "humidityMin": 25,
+   "toxicToPets": true,
+   "confidence": "draft"
+  }
+ ]
+}

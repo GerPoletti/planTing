@@ -1,0 +1,659 @@
+{
+ "version": 1,
+ "symptoms": [
+  {
+   "id": "yellow",
+   "title": {
+    "es": "Hojas amarillas",
+    "it": "Foglie gialle"
+   },
+   "question": {
+    "es": "¿Cómo está el sustrato?",
+    "it": "Com'è il terriccio?"
+   },
+   "options": [
+    {
+     "label": {
+      "es": "Húmedo o encharcado",
+      "it": "Umido o zuppo"
+     },
+     "cause": {
+      "title": {
+       "es": "Exceso de riego o mal drenaje",
+       "it": "Troppa acqua o drenaggio scarso"
+      },
+      "why": {
+       "es": "Las raíces sin oxígeno no absorben agua ni nutrientes.",
+       "it": "Le radici senza ossigeno non assorbono acqua né nutrienti."
+      },
+      "steps": [
+       {
+        "es": "Dejar secar los primeros 3 a 4 cm antes de volver a regar",
+        "it": "Lasciare asciugare i primi 3-4 cm prima di annaffiare di nuovo"
+       },
+       {
+        "es": "Revisar el drenaje: agujeros en la maceta y plato sin agua acumulada",
+        "it": "Controllare il drenaggio: fori nel vaso e sottovaso senza acqua stagnante"
+       },
+       {
+        "es": "Si no mejora, mirar las raíces: si están blandas u oscuras, cortar lo podrido y cambiar el sustrato",
+        "it": "Se non migliora, controllare le radici: se sono molli o scure, tagliare le parti marce e cambiare il terriccio"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Seco desde hace días",
+      "it": "Asciutto da giorni"
+     },
+     "cause": {
+      "title": {
+       "es": "Falta de agua",
+       "it": "Mancanza d'acqua"
+      },
+      "why": {
+       "es": "La planta sacrifica hojas para ahorrar agua.",
+       "it": "La pianta sacrifica foglie per risparmiare acqua."
+      },
+      "steps": [
+       {
+        "es": "Regar a fondo hasta que salga agua por el drenaje",
+        "it": "Annaffiare a fondo fino a far uscire l'acqua dal drenaggio"
+       },
+       {
+        "es": "Si el sustrato repele el agua, sumergir la maceta 15 minutos",
+        "it": "Se il terriccio respinge l'acqua, immergere il vaso per 15 minuti"
+       },
+       {
+        "es": "Ajustar la frecuencia al ritmo real de secado",
+        "it": "Adattare la frequenza al ritmo reale di asciugatura"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Normal, y solo se amarillean hojas viejas de abajo",
+      "it": "Normale, e ingialliscono solo le foglie vecchie in basso"
+     },
+     "cause": {
+      "title": {
+       "es": "Envejecimiento natural o falta de nutrientes",
+       "it": "Invecchiamento naturale o carenza di nutrienti"
+      },
+      "why": {
+       "es": "Perder alguna hoja vieja es normal; si son muchas, suele faltar nitrógeno.",
+       "it": "Perdere qualche foglia vecchia è normale; se sono molte, spesso manca azoto."
+      },
+      "steps": [
+       {
+        "es": "Quitar las hojas amarillas",
+        "it": "Rimuovere le foglie gialle"
+       },
+       {
+        "es": "Fertilizar con dosis suaves en primavera y verano",
+        "it": "Concimare con dosi leggere in primavera ed estate"
+       },
+       {
+        "es": "Revisar si la planta necesita una maceta más grande",
+        "it": "Verificare se la pianta ha bisogno di un vaso più grande"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "tips",
+   "title": {
+    "es": "Puntas marrones",
+    "it": "Punte marroni"
+   },
+   "question": {
+    "es": "¿Cómo es el ambiente?",
+    "it": "Com'è l'ambiente?"
+   },
+   "options": [
+    {
+     "label": {
+      "es": "Aire seco o calefacción",
+      "it": "Aria secca o riscaldamento"
+     },
+     "cause": {
+      "title": {
+       "es": "Humedad ambiente baja",
+       "it": "Umidità ambientale bassa"
+      },
+      "why": {
+       "es": "Las puntas pierden agua más rápido de lo que la reciben.",
+       "it": "Le punte perdono acqua più in fretta di quanto ne ricevano."
+      },
+      "steps": [
+       {
+        "es": "Agrupar plantas o usar un humidificador",
+        "it": "Raggruppare le piante o usare un umidificatore"
+       },
+       {
+        "es": "Alejar la planta de estufas y aire acondicionado",
+        "it": "Allontanare la pianta da stufe e aria condizionata"
+       },
+       {
+        "es": "Recortar las puntas secas con tijera limpia",
+        "it": "Tagliare le punte secche con forbici pulite"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Riego irregular o agua con mucho sarro",
+      "it": "Annaffiature irregolari o acqua molto calcarea"
+     },
+     "cause": {
+      "title": {
+       "es": "Sales acumuladas o riego irregular",
+       "it": "Accumulo di sali o annaffiature irregolari"
+      },
+      "why": {
+       "es": "Las sales se concentran en las puntas y las queman.",
+       "it": "I sali si concentrano nelle punte e le bruciano."
+      },
+      "steps": [
+       {
+        "es": "Lavar el sustrato con abundante agua",
+        "it": "Lavare il terriccio con abbondante acqua"
+       },
+       {
+        "es": "Usar agua reposada o de lluvia",
+        "it": "Usare acqua lasciata decantare o piovana"
+       },
+       {
+        "es": "Regar de forma pareja",
+        "it": "Annaffiare in modo regolare"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Fertilizo seguido",
+      "it": "Concimo spesso"
+     },
+     "cause": {
+      "title": {
+       "es": "Exceso de fertilizante",
+       "it": "Eccesso di concime"
+      },
+      "why": {
+       "es": "Demasiado abono quema raíces y puntas.",
+       "it": "Troppo concime brucia radici e punte."
+      },
+      "steps": [
+       {
+        "es": "Suspender el abono 1 o 2 meses",
+        "it": "Sospendere il concime per 1-2 mesi"
+       },
+       {
+        "es": "Lavar el sustrato con abundante agua",
+        "it": "Lavare il terriccio con abbondante acqua"
+       },
+       {
+        "es": "Retomar con la mitad de la dosis",
+        "it": "Riprendere con metà dose"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "droop",
+   "title": {
+    "es": "Hojas caídas o flácidas",
+    "it": "Foglie afflosciate o cadenti"
+   },
+   "question": {
+    "es": "¿Cómo está el sustrato?",
+    "it": "Com'è il terriccio?"
+   },
+   "options": [
+    {
+     "label": {
+      "es": "Seco",
+      "it": "Asciutto"
+     },
+     "cause": {
+      "title": {
+       "es": "Falta de agua",
+       "it": "Mancanza d'acqua"
+      },
+      "why": {
+       "es": "Las hojas pierden firmeza sin agua.",
+       "it": "Le foglie perdono turgore senza acqua."
+      },
+      "steps": [
+       {
+        "es": "Regar a fondo hasta que salga agua por el drenaje",
+        "it": "Annaffiare a fondo fino a far uscire l'acqua dal drenaggio"
+       },
+       {
+        "es": "Si el sustrato repele el agua, sumergir la maceta 15 minutos",
+        "it": "Se il terriccio respinge l'acqua, immergere il vaso per 15 minuti"
+       },
+       {
+        "es": "Ajustar la frecuencia al ritmo real de secado",
+        "it": "Adattare la frequenza al ritmo reale di asciugatura"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Húmedo y con mal olor",
+      "it": "Umido e con cattivo odore"
+     },
+     "cause": {
+      "title": {
+       "es": "Pudrición de raíces",
+       "it": "Marciume radicale"
+      },
+      "why": {
+       "es": "El exceso de agua mata las raíces y la planta se marchita igual.",
+       "it": "L'eccesso d'acqua uccide le radici e la pianta appassisce lo stesso."
+      },
+      "steps": [
+       {
+        "es": "Sacar la planta de la maceta y cortar las raíces podridas",
+        "it": "Estrarre la pianta dal vaso e tagliare le radici marce"
+       },
+       {
+        "es": "Usar sustrato nuevo con perlita y una maceta con drenaje",
+        "it": "Usare terriccio nuovo con perlite e un vaso con drenaggio"
+       },
+       {
+        "es": "Regar menos hasta que se recupere",
+        "it": "Annaffiare meno finché non si riprende"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "La cambié de lugar o la trasplanté",
+      "it": "L'ho spostata o rinvasata"
+     },
+     "cause": {
+      "title": {
+       "es": "Estrés por el cambio",
+       "it": "Stress da cambiamento"
+      },
+      "why": {
+       "es": "Es una reacción normal de adaptación.",
+       "it": "È una normale reazione di adattamento."
+      },
+      "steps": [
+       {
+        "es": "Mantenerla estable 2 o 3 semanas",
+        "it": "Mantenerla stabile per 2-3 settimane"
+       },
+       {
+        "es": "Evitar corrientes de aire y sol directo nuevo",
+        "it": "Evitare correnti d'aria e nuovo sole diretto"
+       },
+       {
+        "es": "No fertilizar hasta que se recupere",
+        "it": "Non concimare finché non si riprende"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "spots",
+   "title": {
+    "es": "Manchas en las hojas",
+    "it": "Macchie sulle foglie"
+   },
+   "question": {
+    "es": "¿Cómo son las manchas?",
+    "it": "Come sono le macchie?"
+   },
+   "options": [
+    {
+     "label": {
+      "es": "Secas, marrones o blancas, donde da el sol",
+      "it": "Secche, marroni o bianche, dove batte il sole"
+     },
+     "cause": {
+      "title": {
+       "es": "Quemadura solar",
+       "it": "Scottatura solare"
+      },
+      "why": {
+       "es": "Recibe más luz de la que tolera.",
+       "it": "Riceve più luce di quella che tollera."
+      },
+      "steps": [
+       {
+        "es": "Mover la planta a luz filtrada",
+        "it": "Spostare la pianta in luce filtrata"
+       },
+       {
+        "es": "Medir su luz en la sección Medir",
+        "it": "Misurare la sua luce nella sezione Misura"
+       },
+       {
+        "es": "Acostumbrarla de a poco a más luz",
+        "it": "Abituarla gradualmente a più luce"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Oscuras, húmedas, con halo amarillo",
+      "it": "Scure, umide, con alone giallo"
+     },
+     "cause": {
+      "title": {
+       "es": "Hongo o bacteria",
+       "it": "Fungo o batterio"
+      },
+      "why": {
+       "es": "Suele deberse a hojas mojadas y poca ventilación.",
+       "it": "Di solito è dovuto a foglie bagnate e scarsa ventilazione."
+      },
+      "steps": [
+       {
+        "es": "Aislar la planta y cortar las hojas afectadas",
+        "it": "Isolare la pianta e tagliare le foglie colpite"
+       },
+       {
+        "es": "No mojar el follaje y mejorar la ventilación",
+        "it": "Non bagnare il fogliame e migliorare la ventilazione"
+       },
+       {
+        "es": "Si avanza, usar un fungicida apto, siguiendo la etiqueta",
+        "it": "Se avanza, usare un fungicida adatto seguendo l'etichetta"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Puntitos finos o telaraña",
+      "it": "Puntini sottili o ragnatele"
+     },
+     "cause": {
+      "title": {
+       "es": "Posible plaga de ácaros",
+       "it": "Possibili acari"
+      },
+      "why": {
+       "es": "Pican las células de la hoja y dejan puntos amarillos.",
+       "it": "Pungono le cellule della foglia e lasciano puntini gialli."
+      },
+      "steps": [
+       {
+        "es": "Mirar el envés de las hojas con una lupa",
+        "it": "Guardare il lato inferiore delle foglie con una lente"
+       },
+       {
+        "es": "Dar una ducha a las hojas y subir la humedad",
+        "it": "Fare una doccia alle foglie e aumentare l'umidità"
+       },
+       {
+        "es": "Seguir el tratamiento del catálogo de plagas",
+        "it": "Seguire il trattamento del catalogo parassiti"
+       }
+      ],
+      "pestId": "acaros"
+     }
+    }
+   ]
+  },
+  {
+   "id": "leggy",
+   "title": {
+    "es": "Crece larga y pálida",
+    "it": "Cresce lunga e pallida"
+   },
+   "question": {
+    "es": "¿Dónde está?",
+    "it": "Dove si trova?"
+   },
+   "options": [
+    {
+     "label": {
+      "es": "Lejos de la ventana o en un lugar oscuro",
+      "it": "Lontana dalla finestra o in un posto buio"
+     },
+     "cause": {
+      "title": {
+       "es": "Poca luz (etiolación)",
+       "it": "Poca luce (eziolamento)"
+      },
+      "why": {
+       "es": "Se estira buscando luz.",
+       "it": "Si allunga cercando la luce."
+      },
+      "steps": [
+       {
+        "es": "Acercarla a una ventana luminosa",
+        "it": "Avvicinarla a una finestra luminosa"
+       },
+       {
+        "es": "Medir su luz y compararla con lo que necesita",
+        "it": "Misurare la sua luce e confrontarla con quella necessaria"
+       },
+       {
+        "es": "Si no alcanza, sumar una lámpara de cultivo unas 12 horas por día",
+        "it": "Se non basta, aggiungere una lampada da coltivazione per circa 12 ore al giorno"
+       }
+      ]
+     }
+    },
+    {
+     "label": {
+      "es": "Cerca de una ventana con buena luz",
+      "it": "Vicino a una finestra con buona luce"
+     },
+     "cause": {
+      "title": {
+       "es": "Falta de nutrientes o frío",
+       "it": "Carenza di nutrienti o freddo"
+      },
+      "why": {
+       "es": "Sin abono o con temperaturas bajas, el crecimiento es débil.",
+       "it": "Senza concime o con temperature basse, la crescita è debole."
+      },
+      "steps": [
+       {
+        "es": "Fertilizar con dosis suaves en la temporada de crecimiento",
+        "it": "Concimare con dosi leggere nella stagione di crescita"
+       },
+       {
+        "es": "Mantener la temperatura por encima del mínimo de la especie",
+        "it": "Mantenere la temperatura sopra il minimo della specie"
+       },
+       {
+        "es": "Revisar si las raíces llenaron la maceta",
+        "it": "Verificare se le radici hanno riempito il vaso"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "bugs",
+   "title": {
+    "es": "Bichos o algo pegajoso",
+    "it": "Insetti o qualcosa di appiccicoso"
+   },
+   "question": {
+    "es": "¿Qué se ve?",
+    "it": "Cosa si vede?"
+   },
+   "options": [
+    {
+     "label": {
+      "es": "Algodoncito blanco",
+      "it": "Cotone bianco"
+     },
+     "cause": {
+      "title": {
+       "es": "Cochinilla algodonosa",
+       "it": "Cocciniglia cotonosa"
+      },
+      "why": {
+       "es": "Se alimenta de la savia y deja residuo pegajoso.",
+       "it": "Si nutre della linfa e lascia residuo appiccicoso."
+      },
+      "steps": [
+       {
+        "es": "Aislar la planta",
+        "it": "Isolare la pianta"
+       },
+       {
+        "es": "Quitar las visibles con un hisopo en alcohol",
+        "it": "Rimuovere quelle visibili con un cotton fioc con alcol"
+       },
+       {
+        "es": "Seguir el tratamiento del catálogo de plagas",
+        "it": "Seguire il trattamento del catalogo parassiti"
+       }
+      ],
+      "pestId": "cochinilla"
+     }
+    },
+    {
+     "label": {
+      "es": "Mosquitas que salen del sustrato",
+      "it": "Moscerini che escono dal terriccio"
+     },
+     "cause": {
+      "title": {
+       "es": "Mosquito del sustrato",
+       "it": "Moscerini del terriccio"
+      },
+      "why": {
+       "es": "Las larvas viven en sustratos siempre húmedos.",
+       "it": "Le larve vivono in terricci sempre umidi."
+      },
+      "steps": [
+       {
+        "es": "Dejar secar la capa superior del sustrato",
+        "it": "Lasciare asciugare lo strato superficiale del terriccio"
+       },
+       {
+        "es": "Colocar trampas amarillas",
+        "it": "Posizionare trappole gialle"
+       },
+       {
+        "es": "Seguir el tratamiento del catálogo de plagas",
+        "it": "Seguire il trattamento del catalogo parassiti"
+       }
+      ],
+      "pestId": "mosquito"
+     }
+    },
+    {
+     "label": {
+      "es": "Grupos verdes o negros en los brotes",
+      "it": "Gruppi verdi o neri sui germogli"
+     },
+     "cause": {
+      "title": {
+       "es": "Pulgón",
+       "it": "Afidi"
+      },
+      "why": {
+       "es": "Chupa la savia de los brotes tiernos.",
+       "it": "Succhia la linfa dei germogli teneri."
+      },
+      "steps": [
+       {
+        "es": "Quitarlos con un chorro de agua",
+        "it": "Rimuoverli con un getto d'acqua"
+       },
+       {
+        "es": "Aplicar jabón potásico",
+        "it": "Applicare sapone potassico"
+       },
+       {
+        "es": "Seguir el tratamiento del catálogo de plagas",
+        "it": "Seguire il trattamento del catalogo parassiti"
+       }
+      ],
+      "pestId": "pulgon"
+     }
+    },
+    {
+     "label": {
+      "es": "Manchas plateadas y puntos negros",
+      "it": "Macchie argentate e puntini neri"
+     },
+     "cause": {
+      "title": {
+       "es": "Trips",
+       "it": "Tripidi"
+      },
+      "why": {
+       "es": "Raspan la hoja y dejan excrementos negros.",
+       "it": "Raschiano la foglia e lasciano escrementi neri."
+      },
+      "steps": [
+       {
+        "es": "Aislar la planta",
+        "it": "Isolare la pianta"
+       },
+       {
+        "es": "Colocar trampas azules pegajosas",
+        "it": "Posizionare trappole cromotropiche blu"
+       },
+       {
+        "es": "Seguir el tratamiento del catálogo de plagas",
+        "it": "Seguire il trattamento del catalogo parassiti"
+       }
+      ],
+      "pestId": "trips"
+     }
+    },
+    {
+     "label": {
+      "es": "Insectos blancos que vuelan al mover la planta",
+      "it": "Insetti bianchi che volano scuotendo la pianta"
+     },
+     "cause": {
+      "title": {
+       "es": "Mosca blanca",
+       "it": "Mosca bianca"
+      },
+      "why": {
+       "es": "Chupa la savia desde el envés de las hojas.",
+       "it": "Succhia la linfa dal lato inferiore delle foglie."
+      },
+      "steps": [
+       {
+        "es": "Aislar la planta",
+        "it": "Isolare la pianta"
+       },
+       {
+        "es": "Colocar trampas amarillas",
+        "it": "Posizionare trappole gialle"
+       },
+       {
+        "es": "Seguir el tratamiento del catálogo de plagas",
+        "it": "Seguire il trattamento del catalogo parassiti"
+       }
+      ],
+      "pestId": "mosca_blanca"
+     }
+    }
+   ]
+  }
+ ]
+}
