@@ -21,6 +21,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -42,6 +43,7 @@
    "tempMin": 12,
    "humidityMin": 40,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -64,6 +66,7 @@
    "tempMin": 10,
    "humidityMin": 30,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -84,6 +87,7 @@
    "tempMin": 5,
    "humidityMin": 20,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -105,6 +109,7 @@
    "tempMin": 8,
    "humidityMin": 20,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -127,6 +132,7 @@
    "tempMin": 10,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -147,6 +153,7 @@
    "tempMin": 16,
    "humidityMin": 55,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -167,6 +174,7 @@
    "tempMin": 12,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -187,6 +195,7 @@
    "tempMin": 12,
    "humidityMin": 60,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -208,6 +217,7 @@
    "tempMin": 12,
    "humidityMin": 40,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -230,6 +240,7 @@
    "tempMin": 10,
    "humidityMin": 40,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -251,6 +262,7 @@
    "tempMin": 15,
    "humidityMin": 45,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -273,6 +285,7 @@
    "tempMin": 12,
    "humidityMin": 30,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -295,6 +308,7 @@
    "tempMin": 13,
    "humidityMin": 50,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -315,6 +329,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -336,6 +351,7 @@
    "tempMin": 5,
    "humidityMin": 20,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -356,6 +372,7 @@
    "tempMin": 8,
    "humidityMin": 20,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -376,6 +393,7 @@
    "tempMin": 12,
    "humidityMin": 45,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -397,6 +415,7 @@
    "tempMin": 12,
    "humidityMin": 45,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -419,6 +438,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": false,
+   "medium": "bark",
    "confidence": "draft"
   },
   {
@@ -439,6 +459,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -459,6 +480,7 @@
    "tempMin": 10,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -479,6 +501,7 @@
    "tempMin": 5,
    "humidityMin": 30,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -499,6 +522,7 @@
    "tempMin": 15,
    "humidityMin": 60,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -520,6 +544,7 @@
    "tempMin": 12,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -542,6 +567,7 @@
    "tempMin": 8,
    "humidityMin": 25,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -562,6 +588,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -583,6 +610,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -604,6 +632,7 @@
    "tempMin": 12,
    "humidityMin": 35,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -624,6 +653,7 @@
    "tempMin": 5,
    "humidityMin": 25,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -644,6 +674,7 @@
    "tempMin": 5,
    "humidityMin": 45,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -664,6 +695,7 @@
    "tempMin": 13,
    "humidityMin": 55,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -685,6 +717,7 @@
    "tempMin": 15,
    "humidityMin": 55,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -706,6 +739,7 @@
    "tempMin": 10,
    "humidityMin": 40,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -727,6 +761,7 @@
    "tempMin": 15,
    "humidityMin": 50,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -748,6 +783,7 @@
    "tempMin": 10,
    "humidityMin": 50,
    "toxicToPets": false,
+   "medium": "air",
    "confidence": "draft"
   },
   {
@@ -770,6 +806,7 @@
    "tempMin": 12,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -791,6 +828,7 @@
    "tempMin": 15,
    "humidityMin": 55,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -812,6 +850,7 @@
    "tempMin": 10,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -832,6 +871,7 @@
    "tempMin": 16,
    "humidityMin": 55,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -853,6 +893,7 @@
    "tempMin": 8,
    "humidityMin": 40,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -874,6 +915,7 @@
    "tempMin": 8,
    "humidityMin": 25,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -894,6 +936,7 @@
    "tempMin": 10,
    "humidityMin": 40,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -914,6 +957,7 @@
    "tempMin": 0,
    "humidityMin": 40,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -934,6 +978,7 @@
    "tempMin": -5,
    "humidityMin": 30,
    "toxicToPets": false,
+   "medium": "soil",
    "confidence": "draft"
   },
   {
@@ -954,6 +999,7 @@
    "tempMin": -5,
    "humidityMin": 25,
    "toxicToPets": true,
+   "medium": "soil",
    "confidence": "draft"
   }
  ]

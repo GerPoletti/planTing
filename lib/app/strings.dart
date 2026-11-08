@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import 'package:intl/intl.dart';
+import '../data/dates.dart';
 
 /// Idiomas de la app: español de España, español rioplatense e italiano.
 const List<Locale> supportedAppLocales = [
@@ -99,9 +100,7 @@ class AppStrings {
 
   /// Cuenta regresiva en días: hoy, mañana, en N días o atrasado.
   String relativeDay(DateTime due, {DateTime? now}) {
-    final today = DateTime.now();
-    final base = DateTime((now ?? today).year, (now ?? today).month, (now ?? today).day);
-    final days = DateTime(due.year, due.month, due.day).difference(base).inDays;
+    final days = daysBetween(now ?? DateTime.now(), due);
     if (days < 0) return plural('rel.late', -days);
     if (days == 0) return t('rel.today');
     if (days == 1) return t('rel.tomorrow');

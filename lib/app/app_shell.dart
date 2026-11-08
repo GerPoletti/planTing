@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../ui/theme.dart';
 import 'providers.dart';
+import 'save_status.dart';
 
 /// Estructura con la barra inferior: cuatro secciones y el botón central de medir.
 class AppShell extends ConsumerWidget {
@@ -22,7 +23,11 @@ class AppShell extends ConsumerWidget {
           onTap: () => shell.goBranch(index, initialLocation: index == shell.currentIndex),
           child: Padding(
             padding: const EdgeInsets.only(top: 10, bottom: 6),
-            child: Column(
+            // La barra tiene alto fijo: con fuentes grandes el ícono y el texto
+            // se achican en vez de desbordar.
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(selected ? activeIcon : icon, color: selected ? MC.ink : MC.muted, size: 26),
@@ -37,13 +42,14 @@ class AppShell extends ConsumerWidget {
                 ),
               ],
             ),
+            ),
           ),
         ),
       );
     }
 
     return Scaffold(
-      body: shell,
+      body: SaveStatusFrame(child: shell),
       bottomNavigationBar: Material(
         color: MC.card,
         elevation: 0,

@@ -7,7 +7,8 @@ import '../../data/content.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 
-/// Colección: un álbum de especies que se desbloquean al sumar una planta.
+/// Colección: todas las fichas están abiertas para investigar. Una especie
+/// queda «adquirida» al sumar una planta de ella.
 class CollectionScreen extends ConsumerWidget {
   const CollectionScreen({super.key});
 
@@ -55,9 +56,9 @@ class CollectionScreen extends ConsumerWidget {
             for (final sp in all)
               _Tile(
                 species: sp,
-                unlocked: owned.contains(sp.id),
+                acquired: owned.contains(sp.id),
                 lang: s.lang,
-                lockedText: s.t('collection.locked'),
+                acquiredText: s.t('collection.acquired'),
               ),
           ],
         ),
@@ -71,35 +72,38 @@ class CollectionScreen extends ConsumerWidget {
 class _Tile extends StatelessWidget {
   const _Tile({
     required this.species,
-    required this.unlocked,
+    required this.acquired,
     required this.lang,
-    required this.lockedText,
+    required this.acquiredText,
   });
 
   final Species species;
-  final bool unlocked;
+  final bool acquired;
   final String lang;
-  final String lockedText;
+  final String acquiredText;
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      color: unlocked ? MC.card : MC.cream,
-      borderColor: unlocked ? null : MC.line,
+      color: acquired ? MC.sage : MC.card,
+      borderColor: acquired ? MC.olive : null,
       padding: const EdgeInsets.all(8),
-      onTap: () {
-        if (unlocked) {
-          context.push('/species/${species.id}');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lockedText)));
-        }
-      },
+      onTap: () => context.push('/species/${species.id}'),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          unlocked
-              ? const LeafGlyph(size: 40)
-              : const Icon(Icons.lock_outline, size: 28, color: MC.line),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Opacity(opacity: acquired ? 1 : 0.55, child: const LeafGlyph(size: 40)),
+              if (acquired)
+                Positioned(
+                  right: -8,
+                  top: -6,
+                  child: Icon(Icons.verified, size: 18, color: MC.olive, semanticLabel: acquiredText),
+                ),
+            ],
+          ),
           const SizedBox(height: 8),
           Text(
             species.name(lang),
@@ -109,7 +113,7 @@ class _Tile extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: unlocked ? MC.ink : MC.muted,
+              color: acquired ? MC.ink : MC.muted,
             ),
           ),
         ],

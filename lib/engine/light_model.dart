@@ -75,6 +75,11 @@ class DliEstimate {
     return Confidence.low;
   }
 
+  /// Pico de esta medición sola (sin promediar con las anteriores del día).
+  /// Es lo que se guarda, para que los promedios posteriores no se sesguen.
+  double get measurementPeak =>
+      (artificial || sunFraction <= 0.25) ? ppfd : ppfd / sunFraction;
+
   /// Con el sol muy bajo la proyección al pico no es confiable.
   bool get measuredAtGoodTime => artificial || sunFraction > 0.25;
 }
@@ -198,6 +203,30 @@ class LightModel {
     final direct = exterior ? 600.0 : 250.0;
     final indirect = exterior ? 100.0 : 35.0;
     return (sunHours * direct + (dayLength - sunHours) * indirect) * 3.6 / 1000;
+  }
+
+  // Supuestos del mapa de luz, a calibrar con luxómetro (docs/VALIDACION.md).
+
+  /// Parte de las horas de sol que en promedio están despejadas.
+  static const double sunnyFraction = 0.6;
+
+  /// Parte de la luz que pasa por un vidrio.
+  static const double glassTransmission = 0.75;
+
+  /// PPFD del sol directo sobre una superficie que lo mira de frente, con
+  /// cielo despejado, según la elevación del sol en grados (masa de aire).
+  static double beamPpfd(double elevation) {
+    if (elevation <= 0) return 0;
+    final airMass = 1 / math.max(math.sin(elevation * math.pi / 180), 0.05);
+    return 2000 * math.pow(0.7, math.pow(airMass, 0.678)).toDouble();
+  }
+
+  /// PPFD medio de la luz del cielo (sin el sol directo) sobre una superficie
+  /// horizontal con todo el cielo a la vista. Baja en invierno.
+  static double skyPpfd(double latitude, int dayOfYear) {
+    final declination = 23.44 * math.sin(2 * math.pi * (284 + dayOfYear) / 365);
+    final noon = 90 - (latitude - declination).abs();
+    return 60 + 280 * math.sin(math.max(noon, 0) * math.pi / 180);
   }
 
   /// Cuánta luz queda a [meters] de la ventana respecto de la que hay en ella.

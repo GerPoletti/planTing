@@ -51,7 +51,7 @@ class _SpeciesPickerState extends ConsumerState<SpeciesPicker> {
             padding: const EdgeInsets.all(8),
             child: Text(s.t('onb.plant.empty'), style: const TextStyle(color: MC.muted, fontSize: 14)),
           ),
-        for (final sp in results)
+        for (final sp in [...results, Content.unknown])
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: AppCard(
@@ -69,13 +69,20 @@ class _SpeciesPickerState extends ConsumerState<SpeciesPicker> {
                       children: [
                         Text(sp.name(s.lang), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                         Text(
-                          sp.scientific,
-                          style: const TextStyle(fontStyle: FontStyle.italic, color: MC.muted, fontSize: 13),
+                          sp.isUnknown ? s.t('species.unknown_sub') : sp.scientific,
+                          style: TextStyle(
+                            fontStyle: sp.isUnknown ? FontStyle.normal : FontStyle.italic,
+                            color: MC.muted,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
+                  if (sp.isUnknown)
+                    const Icon(Icons.help_outline, size: 20, color: MC.muted)
+                  else
+                    Icon(
                     sp.toxicToPets ? Icons.warning_amber_rounded : Icons.pets,
                     size: 20,
                     color: sp.toxicToPets ? MC.terraDark : MC.olive,

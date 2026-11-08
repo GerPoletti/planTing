@@ -46,7 +46,15 @@ class _MirasolAppState extends ConsumerState<MirasolApp> with WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _scheduleSync();
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      // Guardar ya: el sistema puede cerrar la app sin avisar.
+      ref.read(storeProvider).flush();
+    }
+    if (state == AppLifecycleState.resumed) {
+      // El pronóstico puede haber quedado viejo mientras la app estaba en pausa.
+      ref.invalidate(weatherProvider);
+      _scheduleSync();
+    }
   }
 
   void _scheduleSync() {

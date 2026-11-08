@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/onboarding/primer_screen.dart';
+import '../features/settings/settings_screen.dart';
 import '../services/location_service.dart';
 import 'providers.dart';
 
@@ -37,6 +38,16 @@ Future<LocationAsk> requestLocation(
     st.placeName = loc.name;
   });
   return LocationAsk.saved;
+}
+
+/// Pide la ubicación y, si la persona prefiere no darla o el sistema no puede,
+/// abre enseguida la búsqueda por ciudad. Devuelve true si quedó guardada.
+Future<bool> askLocation(BuildContext context, WidgetRef ref) async {
+  final result = await requestLocation(context, ref);
+  if (result == LocationAsk.saved) return true;
+  if (!context.mounted) return false;
+  await showCitySheet(context);
+  return ref.read(storeProvider).settings.latitude != null;
 }
 
 /// Guarda una ubicación elegida a mano, por ejemplo al buscar una ciudad.

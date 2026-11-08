@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/actions.dart';
 import '../../app/labels.dart';
 import '../../app/providers.dart';
 import '../../app/strings.dart';
@@ -9,7 +10,7 @@ import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../data/store.dart';
 import '../../engine/light_map.dart';
-import '../../engine/light_model.dart';
+import '../../engine/light_assessment.dart';
 import '../../engine/sun_engine.dart';
 import '../../services/weather_service.dart';
 import '../../ui/theme.dart';
@@ -38,7 +39,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// El mapa se vuelve a calcular solo cuando cambian los datos, la latitud o el día.
   LightMap _mapFor(AppStore store) {
-    final lat = store.settings.latitude ?? 40.0;
+    final lat = store.settings.latitude ?? fallbackLatitude;
     final day = SunEngine.dayOfYear(DateTime.now());
     if (_map == null || _mapRevision != store.revision || _mapLat != lat || _mapDay != day) {
       _map = LightMap(
@@ -55,12 +56,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return _map!;
   }
 
-  void _addRoom() {
+  /// Pregunta si es un ambiente interior o un espacio exterior y lo crea.
+  Future<void> _addRoom() async {
     final store = ref.read(storeProvider);
     final s = ref.read(stringsProvider);
+    final kind = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (k, icon) in [
+              (RoomKind.indoor, Icons.weekend_outlined),
+              (RoomKind.balcony, Icons.balcony_outlined),
+              (RoomKind.terrace, Icons.deck_outlined),
+              (RoomKind.garden, Icons.park_outlined),
+            ])
+              ListTile(
+                leading: Icon(icon),
+                title: Text(s.t('room.kind.$k')),
+                subtitle: Text(s.t('room.kind_help.$k')),
+                onTap: () => Navigator.of(ctx).pop(k),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (kind == null || !mounted) return;
     final room = store.addRoom(
-      name: s.t('home.new_room', {'n': store.rooms.length + 1}),
-      exterior: false,
+      name: kind == RoomKind.indoor
+          ? s.t('home.new_room', {'n': store.rooms.length + 1})
+          : s.t('room.kind.$kind'),
+      exterior: kind != RoomKind.indoor,
+      kind: kind,
+      h: kind == RoomKind.balcony ? 1.5 : 3,
     );
     context.push('/room/${room.id}');
   }
@@ -203,6 +232,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
             ],
+            if (store.rooms.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => context.push('/where'),
+                icon: const Icon(Icons.place_outlined),
+                label: Text(s.t('where.from_home')),
+              ),
+            ],
+            if (store.settings.latitude == null && store.rooms.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              AppCard(
+                color: MC.sunLight,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(s.t('home.no_location'), style: const TextStyle(fontSize: 13, height: 1.35)),
+                    ),
+                    TextButton(
+                      onPressed: () => askLocation(context, ref),
+                      child: Text(s.t('measure.set_location')),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             if (alerts.isNotEmpty) ...[
               const SizedBox(height: 14),
               for (final a in alerts.take(2)) _alertCard(s, a),
@@ -259,12 +314,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _plantPanel(AppStrings s, AppStore store, Content content, LightMap map) {
     final plant = store.plantById(_plantId);
-    final species = plant == null ? null : content.speciesById(plant.speciesId);
-    if (plant == null || species == null) return const SizedBox.shrink();
-
-    final dli = map.lightAt(plant.x, plant.y);
-    final verdict = LightModel.verdict(dli, species.dliMin, species.dliMax);
-    final best = verdict == LightVerdict.ok ? null : map.bestSpot(species);
+    if (plant == null) return const SizedBox.shrink();
+    final species = content.speciesById(plant.speciesId);
+    final light = assessPlantLight(store: store, map: map, species: species, plant: plant);
+    final detail = assessmentDetail(s, light);
 
     return AppCard(
       child: Column(
@@ -278,33 +331,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   style: displayStyle(20),
                 ),
               ),
-              verdictTag(s, verdict),
+              const SizedBox(width: 8),
+              Flexible(child: assessmentTag(s, light)),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            s.t('home.plant.est', {
-              'dli': s.number(dli),
-              'min': s.number(species.dliMin, digits: 0),
-              'max': s.number(species.dliMax, digits: 0),
-            }),
-            style: const TextStyle(color: MC.muted, fontSize: 13),
+          if (detail != null) ...[
+            const SizedBox(height: 6),
+            Text(detail, style: const TextStyle(color: MC.muted, fontSize: 13, height: 1.35)),
+          ],
+          if (species != null && !species.isUnknown)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                s.t('where.needs', {
+                  'min': s.number(species.dliMin, digits: 0),
+                  'max': s.number(species.dliMax, digits: 0),
+                }),
+                style: const TextStyle(color: MC.muted, fontSize: 12),
+              ),
+            ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              if (light.evidence != LightEvidence.measured)
+                OutlinedButton(
+                  onPressed: () => context.push('/measure?plant=${plant.id}'),
+                  child: Text(s.t('suggest.measure')),
+                ),
+              if (species != null && !species.isUnknown)
+                TextButton(
+                  onPressed: () => context.push('/where?plant=${plant.id}'),
+                  child: Text(s.t('where.from_plant')),
+                ),
+            ],
           ),
-          const SizedBox(height: 10),
-          if (verdict == LightVerdict.ok)
-            Text(s.t('home.plant.good'), style: const TextStyle(fontSize: 14))
-          else if (best != null && best.inRange) ...[
-            Text(
-              s.t('home.plant.better', {'room': best.room.name, 'dli': s.number(best.dli)}),
-              style: const TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              onPressed: () => store.movePlant(plant, best.x, best.y),
-              child: Text(s.t('home.plant.move')),
-            ),
-          ] else
-            Text(s.t('home.plant.none'), style: const TextStyle(fontSize: 14, height: 1.4)),
           const SizedBox(height: 10),
           Text(s.t('home.plant.hint'), style: const TextStyle(color: MC.muted, fontSize: 12)),
           const SizedBox(height: 10),
@@ -333,7 +395,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _roomPanel(AppStrings s, AppStore store, LightMap map) {
     final room = store.roomById(_roomId);
     if (room == null) return const SizedBox.shrink();
-    final azimuthOf = (WindowSpot w) => windowAzimuth(w, store.settings.northOffset);
+    double azimuthOf(WindowSpot w) => windowAzimuth(w, store.settings.northOffset);
     final readings = map.readingsIn(room.id);
 
     return AppCard(
@@ -343,10 +405,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             children: [
               Expanded(child: Text(room.name, style: displayStyle(20))),
-              Tag(
-                room.exterior ? s.t('home.exterior') : s.t('home.interior'),
-                background: MC.sage,
-                color: MC.olive,
+              Flexible(
+                child: Tag(
+                  room.exterior ? s.t('home.exterior') : s.t('home.interior'),
+                  background: MC.sage,
+                  color: MC.olive,
+                ),
               ),
             ],
           ),

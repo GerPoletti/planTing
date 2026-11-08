@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../data/content.dart';
+import '../../ui/pickers.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 import '../onboarding/species_picker.dart';
@@ -21,6 +22,7 @@ class AddPlantScreen extends ConsumerStatefulWidget {
 class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
   Species? _species;
   String? _roomId;
+  WateredWhen _watered = WateredWhen.unknown;
   final TextEditingController _nickname = TextEditingController();
 
   @override
@@ -42,12 +44,13 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
     final room = store.roomById(_roomId);
     final species = _species;
     if (room == null || species == null) return;
-    final spot = store.defaultSpot(room);
+    final spot = store.freeSpot(room);
     final plant = store.addPlant(
       speciesId: species.id,
       nickname: _nickname.text.trim(),
       x: spot.dx,
       y: spot.dy,
+      wateredAt: wateredAtFor(_watered),
     );
     context.pushReplacement('/plant/${plant.id}');
   }
@@ -95,6 +98,8 @@ class _AddPlantScreenState extends ConsumerState<AddPlantScreen> {
           textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(labelText: s.t('onb.name.field')),
         ),
+        SectionTitle(s.t('watered.title')),
+        WateredWhenChips(value: _watered, onChanged: (w) => setState(() => _watered = w)),
       ],
     );
   }

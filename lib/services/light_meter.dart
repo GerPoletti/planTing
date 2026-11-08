@@ -67,11 +67,20 @@ class MeasureSession {
   bool _cancelled = false;
   StreamSubscription<double>? _sub;
   Timer? _timer;
+  Completer<void>? _done;
 
+  bool get cancelled => _cancelled;
+
+  /// Corta la medición: run() termina enseguida con MeasureError.cancelled y
+  /// el sensor o la cámara se apagan.
   void cancel() {
+    if (_cancelled) return;
     _cancelled = true;
     _sub?.cancel();
     _timer?.cancel();
+    final done = _done;
+    if (done != null && !done.isCompleted) done.complete();
+    MirasolLight.cancelMeasure();
   }
 
   Future<MeasureOutcome> run() {
@@ -94,8 +103,10 @@ class MeasureSession {
     final info = await MirasolLight.sensorInfo();
     if (!info.available) return const MeasureOutcome.failed(MeasureError.noSensor);
 
+    if (_cancelled) return const MeasureOutcome.failed(MeasureError.cancelled);
     final samples = <double>[];
     final done = Completer<void>();
+    _done = done;
     _sub = MirasolLight.luxStream().listen(
       samples.add,
       onError: (Object _) {
@@ -134,6 +145,9 @@ class MeasureSession {
       ));
     } on PlatformException catch (e) {
       _timer?.cancel();
+      if (_cancelled || e.code == 'CANCELLED') {
+        return const MeasureOutcome.failed(MeasureError.cancelled);
+      }
       if (e.code == 'NO_PERMISSION') {
         return const MeasureOutcome.failed(MeasureError.noPermission);
       }

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plantapp/data/content.dart';
-import 'package:plantapp/data/models.dart';
 import 'package:plantapp/data/store.dart';
 import 'package:plantapp/services/compass_service.dart';
 import 'package:plantapp/services/location_service.dart';
@@ -98,10 +97,14 @@ void main() {
         Map<String, dynamic>.from(_openMeteoSample),
         DateTime(2026, 10, 31, 10),
       );
-      final alerts = computeWeatherAlerts(w, const [
-        ExteriorPlant('echeveria', 5),
-        ExteriorPlant('lavanda', -5),
-      ]);
+      final alerts = computeWeatherAlerts(
+        w,
+        const [
+          ExteriorPlant('echeveria', 5),
+          ExteriorPlant('lavanda', -5),
+        ],
+        now: DateTime(2026, 10, 31, 10),
+      );
       final cold = alerts.where((a) => a.type == WeatherAlertType.cold).toList();
       expect(cold.length, 1);
       expect(cold.first.plantIds, ['echeveria']); // 3,1 °C < 5 °C, pero no < -5 °C
@@ -114,7 +117,7 @@ void main() {
         Map<String, dynamic>.from(_openMeteoSample),
         DateTime(2026, 10, 31, 10),
       );
-      expect(computeWeatherAlerts(w, const []), isEmpty);
+      expect(computeWeatherAlerts(w, const [], now: DateTime(2026, 10, 31, 10)), isEmpty);
     });
   });
 

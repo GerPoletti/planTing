@@ -10,17 +10,19 @@ WateringAdvice? wateringAdviceFor(WidgetRef ref, PlantItem plant) {
   final store = ref.watch(storeProvider);
   final content = ref.watch(contentProvider);
   final species = content.speciesById(plant.speciesId);
-  if (species == null) return null;
+  // Sin especie cargada o sin tierra (plantas aéreas) no hay revisión con el dedo.
+  if (species == null || species.medium == 'air') return null;
   final history = store.moistureFor(plant.id);
   final room = store.roomById(plant.roomId);
-  final days = ref.watch(weatherProvider).valueOrNull?.days;
-  final rain = (days != null && days.isNotEmpty) ? days.first.precipitationMm : null;
+  final weather = ref.watch(weatherProvider).valueOrNull;
+  final rain = weather?.dayOf(DateTime.now())?.precipitationMm;
   return WateringEngine.advise(
     species: species,
     plant: plant,
     recentMoisture: history.take(6).toList(),
     latitude: store.settings.latitude,
-    exterior: room?.exterior ?? false,
+    // La lluvia solo cuenta si la maceta queda a la intemperie.
+    exterior: (room?.exterior ?? false) && !(room?.covered ?? false),
     rainTodayMm: rain,
     lightFactor: WateringEngine.plantLightFactor(store, content, plant),
   );

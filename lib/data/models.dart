@@ -13,6 +13,29 @@ String newId() {
   return '$t$r';
 }
 
+/// Alturas rápidas para ubicar una maceta, en cm desde el piso.
+enum PlantLevel {
+  floor(0),
+  table(75),
+  shelf(150),
+  hanging(190);
+
+  const PlantLevel(this.cm);
+  final double cm;
+
+  /// Nivel más cercano a una altura.
+  static PlantLevel nearest(double cm) {
+    var best = PlantLevel.table;
+    for (final l in PlantLevel.values) {
+      if ((l.cm - cm).abs() < (best.cm - cm).abs()) best = l;
+    }
+    return best;
+  }
+}
+
+/// Altura que se supone cuando una planta no la tiene cargada (una mesa).
+const double defaultPlantHeightCm = 75;
+
 /// Ajustes de la persona usuaria.
 class Settings {
   Settings({
@@ -58,6 +81,14 @@ class Settings {
   /// Avisos previos a permisos que ya se mostraron (location, camera, notifications).
   List<String> primersShown;
 
+  /// Si hoy cae dentro del modo viaje (incluye el último día elegido).
+  bool travelingOn(DateTime now) {
+    final t = travelUntil;
+    if (t == null) return false;
+    final today = DateTime(now.year, now.month, now.day);
+    return !today.isAfter(DateTime(t.year, t.month, t.day));
+  }
+
   Map<String, dynamic> toJson() => {
         'latitude': latitude,
         'longitude': longitude,
@@ -100,11 +131,24 @@ class WindowSpot {
     required this.wall,
     this.pos = 0.5,
     this.obstruction = 10,
+    this.sillCm = 90,
+    this.topCm = 210,
+    this.widthCm = 120,
   });
 
   final String id;
   String name;
   String wall;
+
+  /// Altura del alféizar (borde de abajo del vidrio) desde el piso, en cm.
+  /// Una puerta-ventana tiene 0.
+  double sillCm;
+
+  /// Altura del borde de arriba de la ventana desde el piso, en cm.
+  double topCm;
+
+  /// Ancho de la ventana, en cm.
+  double widthCm;
 
   /// Posición a lo largo de la pared, de 0 a 1.
   double pos;
@@ -118,6 +162,9 @@ class WindowSpot {
         'wall': wall,
         'pos': pos,
         'obstruction': obstruction,
+        'sillCm': sillCm,
+        'topCm': topCm,
+        'widthCm': widthCm,
       };
 
   factory WindowSpot.fromJson(Map<String, dynamic> j) => WindowSpot(
@@ -126,7 +173,51 @@ class WindowSpot {
         wall: j['wall'] as String? ?? 't',
         pos: _num(j['pos'], 0.5),
         obstruction: _num(j['obstruction'], 10),
+        sillCm: _num(j['sillCm'], 90),
+        topCm: _num(j['topCm'], 210),
+        widthCm: _num(j['widthCm'], 120),
       );
+}
+
+/// Tipos de ambiente. Los exteriores reciben luz del cielo abierto según sus
+/// lados; los interiores, solo por sus ventanas.
+class RoomKind {
+  static const indoor = 'indoor';
+  static const balcony = 'balcony';
+  static const terrace = 'terrace';
+  static const garden = 'garden';
+  static const all = [indoor, balcony, terrace, garden];
+}
+
+/// Qué hay en cada lado de un espacio exterior.
+class SideType {
+  /// Pared o fachada: tapa hasta la altura de las paredes.
+  static const wall = 'wall';
+
+  /// Baranda o muro bajo: tapa solo hasta su altura.
+  static const railing = 'railing';
+
+  /// Abierto: no tapa nada.
+  static const open = 'open';
+  static const all = [wall, railing, open];
+}
+
+/// Lados del plano: arriba, derecha, abajo, izquierda.
+const List<String> planSides = ['t', 'r', 'b', 'l'];
+
+/// Lados típicos de cada tipo de espacio exterior. [front] es el lado abierto
+/// de un balcón.
+Map<String, String> defaultSides(String kind, {String front = 't'}) {
+  switch (kind) {
+    case RoomKind.balcony:
+      return {for (final k in planSides) k: k == front ? SideType.railing : SideType.wall};
+    case RoomKind.terrace:
+      return {for (final k in planSides) k: SideType.railing};
+    case RoomKind.garden:
+      return {for (final k in planSides) k: SideType.open};
+    default:
+      return {for (final k in planSides) k: SideType.wall};
+  }
 }
 
 /// Ambiente de la casa dibujado en el plano. Las medidas son en metros.
@@ -134,7 +225,13 @@ class Room {
   Room({
     required this.id,
     required this.name,
-    this.exterior = false,
+    bool exterior = false,
+    String? kind,
+    Map<String, String>? sides,
+    bool? covered,
+    this.skyObstruction = 15,
+    this.wallCm = 270,
+    this.railingCm = 100,
     this.x = 0,
     this.y = 0,
     this.w = 4,
@@ -143,11 +240,34 @@ class Room {
     this.humidity,
     this.climateAt,
     List<WindowSpot>? windows,
-  }) : windows = windows ?? [];
+  })  : windows = windows ?? [],
+        kind = kind ?? (exterior ? RoomKind.balcony : RoomKind.indoor),
+        sides = sides ?? defaultSides(kind ?? (exterior ? RoomKind.balcony : RoomKind.indoor)),
+        covered = covered ?? (kind ?? (exterior ? RoomKind.balcony : RoomKind.indoor)) == RoomKind.balcony;
 
   final String id;
   String name;
-  bool exterior;
+  /// Uno de [RoomKind]. Se puede cambiar.
+  String kind;
+
+  bool get exterior => kind != RoomKind.indoor;
+
+  /// En exteriores: qué hay en cada lado ('t', 'r', 'b', 'l'), uno de [SideType].
+  final Map<String, String> sides;
+
+  /// En exteriores: si tiene techo o el balcón de arriba (a la altura de [wallCm]).
+  bool covered;
+
+  /// En exteriores: altura de edificios o árboles alrededor, en grados.
+  double skyObstruction;
+
+  /// Altura de las paredes (y del techo, si tiene), en cm.
+  double wallCm;
+
+  /// Altura de la baranda o del muro bajo, en cm.
+  double railingCm;
+
+  String sideOf(String side) => sides[side] ?? SideType.wall;
   double x;
   double y;
   double w;
@@ -164,6 +284,12 @@ class Room {
         'id': id,
         'name': name,
         'exterior': exterior,
+        'kind': kind,
+        'sides': sides,
+        'covered': covered,
+        'skyObstruction': skyObstruction,
+        'wallCm': wallCm,
+        'railingCm': railingCm,
         'x': x,
         'y': y,
         'w': w,
@@ -174,10 +300,33 @@ class Room {
         'windows': windows.map((e) => e.toJson()).toList(),
       };
 
-  factory Room.fromJson(Map<String, dynamic> j) => Room(
+  factory Room.fromJson(Map<String, dynamic> j) {
+    final windows = ((j['windows'] as List?) ?? [])
+        .map((e) => WindowSpot.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+    final exterior = j['exterior'] as bool? ?? false;
+    final kind = j['kind'] as String? ?? (exterior ? RoomKind.balcony : RoomKind.indoor);
+    Map<String, String>? sides;
+    final rawSides = j['sides'];
+    if (rawSides is Map) {
+      sides = {for (final e in rawSides.entries) e.key as String: e.value as String};
+    } else if (kind != RoomKind.indoor && windows.isNotEmpty) {
+      // Datos de antes: un exterior con «ventanas» queda abierto (con baranda)
+      // del lado de cada ventana.
+      sides = defaultSides(RoomKind.balcony, front: windows.first.wall);
+      for (final w in windows) {
+        sides[w.wall] = SideType.railing;
+      }
+    }
+    return Room(
         id: j['id'] as String,
         name: j['name'] as String? ?? '',
-        exterior: j['exterior'] as bool? ?? false,
+        kind: kind,
+        sides: sides,
+        covered: j['covered'] as bool?,
+        skyObstruction: _num(j['skyObstruction'], 15),
+        wallCm: _num(j['wallCm'], 270),
+        railingCm: _num(j['railingCm'], 100),
         x: _num(j['x']),
         y: _num(j['y']),
         w: _num(j['w'], 4),
@@ -185,10 +334,9 @@ class Room {
         temperature: (j['temperature'] as num?)?.toDouble(),
         humidity: (j['humidity'] as num?)?.toDouble(),
         climateAt: _date(j['climateAt']),
-        windows: ((j['windows'] as List?) ?? [])
-            .map((e) => WindowSpot.fromJson(Map<String, dynamic>.from(e as Map)))
-            .toList(),
+        windows: windows,
       );
+  }
 }
 
 /// Planta de la casa.
@@ -205,6 +353,8 @@ class PlantItem {
     this.wateredAt,
     this.careIntervalDays,
     this.photoPath,
+    this.lampHours,
+    this.heightCm,
   }) : createdAt = createdAt ?? DateTime.now();
 
   final String id;
@@ -221,6 +371,12 @@ class PlantItem {
   int? careIntervalDays;
   String? photoPath;
 
+  /// Horas por día que la enciende una lámpara de cultivo. Si es null se usan 12.
+  int? lampHours;
+
+  /// Altura de la maceta desde el piso, en cm. Si es null se usa una mesa.
+  double? heightCm;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'speciesId': speciesId,
@@ -233,6 +389,8 @@ class PlantItem {
         'wateredAt': wateredAt?.toIso8601String(),
         'careIntervalDays': careIntervalDays,
         'photoPath': photoPath,
+        'lampHours': lampHours,
+        'heightCm': heightCm,
       };
 
   factory PlantItem.fromJson(Map<String, dynamic> j) => PlantItem(
@@ -247,6 +405,8 @@ class PlantItem {
         wateredAt: _date(j['wateredAt']),
         careIntervalDays: (j['careIntervalDays'] as num?)?.toInt(),
         photoPath: j['photoPath'] as String?,
+        lampHours: (j['lampHours'] as num?)?.toInt(),
+        heightCm: (j['heightCm'] as num?)?.toDouble(),
       );
 }
 
@@ -266,6 +426,8 @@ class Reading {
     this.y,
     this.saturated = false,
     this.manual = false,
+    this.probe = false,
+    this.heightCm,
   });
 
   final String id;
@@ -290,7 +452,33 @@ class Reading {
   /// Cargada a ojo, sin sensor.
   final bool manual;
 
+  /// Medición de prueba en otro lugar: sirve para el mapa de luz pero no
+  /// describe la luz actual de la planta.
+  final bool probe;
+
+  /// Altura desde el piso donde se midió, en cm (null en datos viejos).
+  final double? heightCm;
+
   bool get isSun => source == 'sun';
+
+  /// La misma medición en otro punto del plano (al corregir el dibujo).
+  Reading movedTo(double nx, double ny) => Reading(
+        id: id,
+        plantId: plantId,
+        at: at,
+        lux: lux,
+        source: source,
+        ppfd: ppfd,
+        dli: dli,
+        peakPpfd: peakPpfd,
+        sunFraction: sunFraction,
+        x: nx,
+        y: ny,
+        saturated: saturated,
+        manual: manual,
+        probe: probe,
+        heightCm: heightCm,
+      );
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -306,6 +494,8 @@ class Reading {
         'y': y,
         'saturated': saturated,
         'manual': manual,
+        'probe': probe,
+        'heightCm': heightCm,
       };
 
   factory Reading.fromJson(Map<String, dynamic> j) => Reading(
@@ -322,6 +512,8 @@ class Reading {
         y: (j['y'] as num?)?.toDouble(),
         saturated: j['saturated'] as bool? ?? false,
         manual: j['manual'] as bool? ?? false,
+        probe: j['probe'] as bool? ?? false,
+        heightCm: (j['heightCm'] as num?)?.toDouble(),
       );
 }
 
@@ -474,11 +666,8 @@ class Treatment {
 
   bool get active => endedAt == null;
 
-  DateTime dueOf(TreatmentTask t) => DateTime(
-        startedAt.year,
-        startedAt.month,
-        startedAt.day,
-      ).add(Duration(days: t.dayOffset));
+  DateTime dueOf(TreatmentTask t) =>
+      DateTime(startedAt.year, startedAt.month, startedAt.day + t.dayOffset);
 
   int get doneCount => tasks.where((t) => t.doneAt != null).length;
 

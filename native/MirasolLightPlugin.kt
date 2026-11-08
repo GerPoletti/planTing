@@ -53,6 +53,12 @@ class MirasolLightPlugin :
                     ),
                 )
             }
+            "cancelMeasure" -> {
+                // En Android la medición es el flujo de lecturas: al cancelar la
+                // suscripción se llama a onCancel. Esto asegura que el sensor se apague.
+                stop()
+                result.success(null)
+            }
             else -> result.notImplemented()
         }
     }

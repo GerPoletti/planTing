@@ -8,6 +8,7 @@ import '../../data/models.dart';
 import '../../engine/watering.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
+import '../../data/dates.dart';
 
 String _adviceTitleKey(WateringAction a) {
   switch (a) {
@@ -26,9 +27,7 @@ String _adviceTitleKey(WateringAction a) {
 
 /// Cuándo se revisó la tierra por última vez, en palabras.
 String _whenText(AppStrings s, DateTime at) {
-  final days = DateTime.now()
-      .difference(DateTime(at.year, at.month, at.day))
-      .inDays;
+  final days = daysBetween(at, DateTime.now());
   return days <= 0 ? s.t('rel.today') : s.plural('rel.ago', days);
 }
 
@@ -55,6 +54,11 @@ class MoistureCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(s.t('moisture.title'), style: displayStyle(18)),
+          if (ref.watch(contentProvider).speciesById(plant.speciesId)?.medium == 'bark')
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(s.t('moisture.bark_note'), style: const TextStyle(color: MC.muted, fontSize: 13, height: 1.35)),
+            ),
           const SizedBox(height: 10),
           _LevelBars(level: last?.level),
           const SizedBox(height: 8),
@@ -95,20 +99,48 @@ class MoistureCard extends ConsumerWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {
-                      store.addEvent(plant.id, CareType.water);
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(s.t('moisture.watered'))));
-                    },
+                    onPressed: () => _water(context, ref, null),
                     child: Text(s.t('moisture.water_now')),
                   ),
                 ),
               ],
             ],
           ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              if (!canWater)
+                ActionChip(
+                  label: Text(s.t('moisture.watered_today')),
+                  onPressed: () => _water(context, ref, null),
+                ),
+              ActionChip(
+                label: Text(s.t('moisture.watered_yesterday')),
+                onPressed: () {
+                  final y = DateTime.now().subtract(const Duration(days: 1));
+                  _water(context, ref, DateTime(y.year, y.month, y.day, 12));
+                },
+              ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+  /// Anota un riego (hoy o en [at]) y permite deshacerlo.
+  void _water(BuildContext context, WidgetRef ref, DateTime? at) {
+    final s = ref.read(stringsProvider);
+    final store = ref.read(storeProvider);
+    final e = store.addEvent(plant.id, CareType.water, at: at);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(s.t('moisture.watered')),
+      action: SnackBarAction(
+        label: s.t('common.undo'),
+        onPressed: () => store.removeEvent(e.id),
+      ),
+    ));
   }
 }
 

@@ -42,16 +42,25 @@ class LightDial extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6),
+          // Cada etiqueta ocupa un cuarto del ancho y puede pasar a dos líneas,
+          // para que nombres largos o texto ampliado no desborden.
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (var i = 0; i < labels.length; i++)
-                Text(
-                  labels[i],
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: highlight == i ? MC.ink : MC.muted,
-                    fontWeight: highlight == i ? FontWeight.w700 : FontWeight.w400,
+                Expanded(
+                  child: Text(
+                    labels[i],
+                    textAlign: i == 0
+                        ? TextAlign.left
+                        : (i == labels.length - 1 ? TextAlign.right : TextAlign.center),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: highlight == i ? MC.ink : MC.muted,
+                      fontWeight: highlight == i ? FontWeight.w700 : FontWeight.w400,
+                    ),
                   ),
                 ),
             ],

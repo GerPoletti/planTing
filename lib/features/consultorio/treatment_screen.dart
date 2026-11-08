@@ -45,13 +45,13 @@ class TreatmentScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Wrap(
+                spacing: 12,
+                runSpacing: 2,
                 children: [
-                  Expanded(
-                    child: Text(
-                      s.t('treatment.progress', {'done': done, 'total': total}),
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
+                  Text(
+                    s.t('treatment.progress', {'done': done, 'total': total}),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   Text(
                     s.t('treatment.started', {'when': s.dayMonth(treatment.startedAt)}),

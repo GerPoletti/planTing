@@ -11,13 +11,14 @@ import '../../app/strings.dart';
 import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../data/store.dart';
-import '../../engine/light_model.dart';
+import '../../engine/light_assessment.dart';
 import '../../services/photo_service.dart';
 import '../../ui/dialogs.dart';
 import '../../ui/theme.dart';
 import '../../ui/verdict.dart';
 import '../../ui/widgets.dart';
 import '../consultorio/treatment_widgets.dart';
+import '../onboarding/species_picker.dart';
 import 'moisture_card.dart';
 
 /// Ficha de una planta.
@@ -81,6 +82,19 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
     _note.clear();
   }
 
+  Future<void> _deleteEvent(String eventId) async {
+    final s = ref.read(stringsProvider);
+    final ok = await confirmDialog(
+      context,
+      title: s.t('plant.event_delete'),
+      body: s.t('plant.event_delete_body'),
+      confirmLabel: s.t('common.delete'),
+      cancelLabel: s.t('common.cancel'),
+    );
+    if (!ok || !mounted) return;
+    ref.read(storeProvider).removeEvent(eventId);
+  }
+
   Future<void> _edit(PlantItem plant) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -114,18 +128,15 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
     final species = content.speciesById(plant.speciesId);
     final room = store.roomById(plant.roomId);
     final window = store.windowById(plant.windowId);
-    final readings = store.readingsFor(plant.id);
+    final light = assessPlantLight(store: store, map: ref.watch(lightMapProvider), species: species, plant: plant);
     final advice = wateringAdviceFor(ref, plant);
     final treatments = store.treatmentsFor(plant.id, onlyActive: true);
 
-    Widget lightValue = Text(s.t('plant.not_measured'), style: const TextStyle(fontWeight: FontWeight.w700));
-    if (species != null && readings.isNotEmpty) {
-      lightValue = verdictTag(s, LightModel.verdict(readings.first.dli, species.dliMin, species.dliMax));
-    }
+    final lightValue = assessmentTag(s, light);
 
     return PageScaffold(
       title: plantName(plant, content, s.lang),
-      subtitle: species == null ? null : species.scientific,
+      subtitle: (species == null || species.isUnknown) ? null : species.scientific,
       showBack: true,
       actions: [
         IconButton(
@@ -155,7 +166,7 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
               child: _Stat(
                 label: s.t('plant.light'),
                 value: lightValue,
-                detail: readings.isEmpty ? null : s.number(readings.first.dli) + ' DLI',
+                detail: assessmentDetail(s, light),
               ),
             ),
             const SizedBox(width: 8),
@@ -172,14 +183,16 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
             Expanded(
               child: _Stat(
                 label: s.t('plant.pets'),
-                value: species == null
+                value: (species == null || species.isUnknown)
                     ? const Text('–')
                     : (species.toxicToPets
                         ? Tag(s.t('plant.toxic_short'), color: MC.terraDark, background: MC.terraLight)
                         : Tag(s.t('plant.safe_short'), color: MC.olive, background: MC.sage)),
                 detail: species == null
                     ? null
-                    : (species.toxicToPets ? s.t('species.toxic') : s.t('species.safe')),
+                    : species.isUnknown
+                        ? s.t('species.toxic_unknown')
+                        : (species.toxicToPets ? s.t('species.toxic') : s.t('species.safe')),
               ),
             ),
           ],
@@ -190,7 +203,10 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
             child: Text(s.t('plant.draft_note'), style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.4)),
           ),
         const SizedBox(height: 14),
-        MoistureCard(plant: plant),
+        if (species?.medium == 'air')
+          AppCard(child: Text(s.t('plant.air_note'), style: const TextStyle(fontSize: 14, height: 1.4)))
+        else
+          MoistureCard(plant: plant),
         if (treatments.isNotEmpty) ...[
           SectionTitle(s.t('plant.treatments')),
           for (final t in treatments) TreatmentSummaryTile(treatment: t),
@@ -214,6 +230,12 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.push('/where?plant=${plant.id}'),
+          icon: const Icon(Icons.place_outlined),
+          label: Text(s.t('where.from_plant')),
         ),
         SectionTitle(s.t('plant.history')),
         Wrap(
@@ -276,6 +298,7 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
       switch (e.type) {
         case CareType.water:
           icon = Icons.water_drop_outlined;
+          if (e.note == AppStore.initialWaterNote) detail = s.t('plant.event.initial_water');
         case CareType.fertilize:
           icon = Icons.science_outlined;
         case CareType.repot:
@@ -302,14 +325,15 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
         default:
           icon = Icons.notes;
       }
-      entries.add(_Entry(e.at, icon, title, detail, e.photoPath));
+      entries.add(_Entry(e.at, icon, title, detail, e.photoPath, eventId: e.id));
     }
     for (final r in store.readingsFor(plant.id)) {
       entries.add(_Entry(
         r.at,
         Icons.wb_sunny_outlined,
         s.t('plant.event.reading'),
-        s.t('plant.event.reading_detail', {'lux': s.number(r.lux, digits: 0), 'dli': s.number(r.dli)}),
+        s.t('plant.event.reading_detail', {'lux': s.number(r.lux, digits: 0), 'dli': s.number(r.dli)}) +
+            (r.probe ? ' · ${s.t('plant.event.probe')}' : ''),
         null,
       ));
     }
@@ -342,6 +366,13 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
                     const SizedBox(width: 10),
                     Expanded(child: Text(e.title, style: const TextStyle(fontWeight: FontWeight.w700))),
                     Text(s.dayMonth(e.at), style: const TextStyle(color: MC.muted, fontSize: 12)),
+                    if (e.eventId != null)
+                      IconButton(
+                        tooltip: s.t('plant.event_delete'),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => _deleteEvent(e.eventId!),
+                        icon: const Icon(Icons.close, size: 18, color: MC.muted),
+                      ),
                   ],
                 ),
                 if (e.detail.isNotEmpty)
@@ -366,7 +397,10 @@ class _PlantScreenState extends ConsumerState<PlantScreen> {
 }
 
 class _Entry {
-  const _Entry(this.at, this.icon, this.title, this.detail, this.photo);
+  const _Entry(this.at, this.icon, this.title, this.detail, this.photo, {this.eventId});
+
+  /// Solo los eventos de la historia se pueden borrar.
+  final String? eventId;
 
   final DateTime at;
   final IconData icon;
@@ -415,6 +449,9 @@ class _EditSheet extends ConsumerStatefulWidget {
 class _EditSheetState extends ConsumerState<_EditSheet> {
   late final TextEditingController _nickname;
   late final TextEditingController _interval;
+  late final TextEditingController _lamp;
+  late final TextEditingController _height;
+  late String _speciesId;
 
   @override
   void initState() {
@@ -423,20 +460,34 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
     _interval = TextEditingController(
       text: widget.plant.careIntervalDays == null ? '' : '${widget.plant.careIntervalDays}',
     );
+    _lamp = TextEditingController(
+      text: widget.plant.lampHours == null ? '' : '${widget.plant.lampHours}',
+    );
+    _speciesId = widget.plant.speciesId;
+    _height = TextEditingController(
+      text: widget.plant.heightCm == null ? '' : plainNum(widget.plant.heightCm!),
+    );
   }
 
   @override
   void dispose() {
     _nickname.dispose();
     _interval.dispose();
+    _lamp.dispose();
+    _height.dispose();
     super.dispose();
   }
 
   void _save() {
     final value = int.tryParse(_interval.text.trim());
+    final lamp = int.tryParse(_lamp.text.trim());
+    final height = parseNum(_height.text);
     ref.read(storeProvider).updatePlant(widget.plant, (p) {
       p.nickname = _nickname.text.trim();
       p.careIntervalDays = (value == null || value < 1) ? null : value;
+      p.lampHours = (lamp == null || lamp < 1 || lamp > 24) ? null : lamp;
+      p.speciesId = _speciesId;
+      p.heightCm = height?.clamp(0, 400).toDouble();
     });
     Navigator.of(context).pop();
   }
@@ -444,6 +495,8 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    final content = ref.watch(contentProvider);
+    final species = content.speciesById(_speciesId);
     return SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(24, 20, 24, 24 + MediaQuery.of(context).viewInsets.bottom),
@@ -459,6 +512,28 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
               decoration: InputDecoration(labelText: s.t('plant.nickname')),
             ),
             const SizedBox(height: 12),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(s.t('plant.species')),
+              subtitle: Text(species?.name(s.lang) ?? _speciesId),
+              trailing: TextButton(
+                onPressed: () async {
+                  final picked = await showModalBottomSheet<Species>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (ctx) => SafeArea(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: SpeciesPicker(onSelected: (sp) => Navigator.of(ctx).pop(sp)),
+                      ),
+                    ),
+                  );
+                  if (picked != null && mounted) setState(() => _speciesId = picked.id);
+                },
+                child: Text(s.t('plant.species_change')),
+              ),
+            ),
+            const SizedBox(height: 4),
             TextField(
               controller: _interval,
               keyboardType: TextInputType.number,
@@ -466,6 +541,40 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
             ),
             const SizedBox(height: 6),
             Text(s.t('plant.interval_help'), style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.35)),
+            const SizedBox(height: 12),
+            Text(s.t('plant.height'), style: const TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                for (final l in PlantLevel.values)
+                  ChoiceChip(
+                    label: Text('${s.t('level.${l.name}')} · ${l.cm.round()} cm'),
+                    selected: parseNum(_height.text) == l.cm,
+                    selectedColor: MC.sage,
+                    backgroundColor: MC.card,
+                    onSelected: (_) => setState(() => _height.text = plainNum(l.cm)),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _height,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: s.t('plant.height_cm')),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 6),
+            Text(s.t('plant.height_help'), style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.35)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _lamp,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: s.t('plant.lamp_hours')),
+            ),
+            const SizedBox(height: 6),
+            Text(s.t('plant.lamp_help'), style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.35)),
             const SizedBox(height: 16),
             FilledButton(onPressed: _save, child: Text(s.t('common.save'))),
           ],

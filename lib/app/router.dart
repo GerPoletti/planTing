@@ -15,9 +15,17 @@ import '../features/home/room_screen.dart';
 import '../features/home/window_screen.dart';
 import '../features/measure/measure_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
+import '../features/placement/where_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/today/today_screen.dart';
 import 'app_shell.dart';
+import 'save_status.dart';
+
+/// Ruta de primer nivel con el aviso de guardado fallido arriba.
+GoRoute _route({required String path, required GoRouterWidgetBuilder builder}) => GoRoute(
+      path: path,
+      builder: (context, state) => SaveStatusFrame(child: builder(context, state)),
+    );
 
 /// Rutas de la app. Mientras no se termine el primer uso, todo lleva al onboarding.
 GoRouter buildRouter(AppStore store) {
@@ -32,7 +40,7 @@ GoRouter buildRouter(AppStore store) {
       return null;
     },
     routes: [
-      GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
+      _route(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
@@ -50,48 +58,63 @@ GoRouter buildRouter(AppStore store) {
           ]),
         ],
       ),
-      GoRoute(
+      _route(
         path: '/measure',
-        builder: (context, state) => MeasureScreen(plantId: state.uri.queryParameters['plant']),
+        builder: (context, state) {
+          final q = state.uri.queryParameters;
+          return MeasureScreen(
+            plantId: q['plant'],
+            probeX: double.tryParse(q['x'] ?? ''),
+            probeY: double.tryParse(q['y'] ?? ''),
+            probeHeightCm: double.tryParse(q['z'] ?? ''),
+          );
+        },
       ),
-      GoRoute(
+      _route(
         path: '/plants/add',
         builder: (context, state) => AddPlantScreen(speciesId: state.uri.queryParameters['species']),
       ),
-      GoRoute(
+      _route(
         path: '/plant/:id',
         builder: (context, state) => PlantScreen(plantId: state.pathParameters['id']!),
       ),
-      GoRoute(
+      _route(
         path: '/room/:id',
         builder: (context, state) => RoomScreen(roomId: state.pathParameters['id']!),
       ),
-      GoRoute(
+      _route(
         path: '/window/:id',
         builder: (context, state) => WindowScreen(windowId: state.pathParameters['id']!),
       ),
-      GoRoute(
+      _route(
         path: '/consultorio',
         builder: (context, state) => ConsultorioScreen(plantId: state.uri.queryParameters['plant']),
       ),
-      GoRoute(path: '/pests', builder: (context, state) => const PestsScreen()),
-      GoRoute(
+      _route(path: '/pests', builder: (context, state) => const PestsScreen()),
+      _route(
         path: '/pest/:id',
         builder: (context, state) => PestScreen(
           pestId: state.pathParameters['id']!,
           plantId: state.uri.queryParameters['plant'],
         ),
       ),
-      GoRoute(
+      _route(
         path: '/treatment/:id',
         builder: (context, state) => TreatmentScreen(treatmentId: state.pathParameters['id']!),
       ),
-      GoRoute(path: '/collection', builder: (context, state) => const CollectionScreen()),
-      GoRoute(
+      _route(path: '/collection', builder: (context, state) => const CollectionScreen()),
+      _route(
         path: '/species/:id',
         builder: (context, state) => SpeciesScreen(speciesId: state.pathParameters['id']!),
       ),
-      GoRoute(path: '/settings', builder: (context, state) => const SettingsScreen()),
+      _route(
+        path: '/where',
+        builder: (context, state) => WhereScreen(
+          plantId: state.uri.queryParameters['plant'],
+          speciesId: state.uri.queryParameters['species'],
+        ),
+      ),
+      _route(path: '/settings', builder: (context, state) => const SettingsScreen()),
     ],
   );
 }

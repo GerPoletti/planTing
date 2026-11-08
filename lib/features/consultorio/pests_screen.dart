@@ -165,9 +165,13 @@ class _PestScreenState extends ConsumerState<PestScreen> {
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             value: _plantId,
+            isExpanded: true,
             items: [
               for (final p in store.plants)
-                DropdownMenuItem(value: p.id, child: Text(plantName(p, content, s.lang))),
+                DropdownMenuItem(
+                  value: p.id,
+                  child: Text(plantName(p, content, s.lang), overflow: TextOverflow.ellipsis),
+                ),
             ],
             onChanged: (v) => setState(() => _plantId = v),
           ),

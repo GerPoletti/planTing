@@ -73,7 +73,7 @@ class TodayScreen extends ConsumerWidget {
 
     final count = tasks.length + careTiles.length;
     final travel = store.settings.travelUntil;
-    final traveling = travel != null && travel.isAfter(now);
+    final traveling = store.settings.travelingOn(now);
 
     return PageScaffold(
       title: s.t('today.title'),
@@ -103,7 +103,7 @@ class TodayScreen extends ConsumerWidget {
                 children: [
                   const Icon(Icons.luggage_outlined, color: MC.ink),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(s.t('today.travel', {'date': s.date(travel)}), style: const TextStyle(fontSize: 14))),
+                  Expanded(child: Text(s.t('today.travel', {'date': s.date(travel!)}), style: const TextStyle(fontSize: 14))),
                 ],
               ),
             ),
@@ -152,7 +152,7 @@ class TodayScreen extends ConsumerWidget {
         child: Text(s.t('today.weather_off'), style: const TextStyle(color: MC.muted, fontSize: 14, height: 1.4)),
       );
     }
-    final today = weather.days.isEmpty ? null : weather.days.first;
+    final today = weather.dayOf(DateTime.now());
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,6 +176,13 @@ class TodayScreen extends ConsumerWidget {
                 style: const TextStyle(color: MC.muted, fontSize: 14),
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              s.t('today.weather_updated', {'when': s.dayMonthTime(weather.fetchedAt)}),
+              style: const TextStyle(color: MC.muted, fontSize: 12),
+            ),
+          ),
           const SizedBox(height: 6),
           const Text('Weather data by Open-Meteo.com', style: TextStyle(color: MC.muted, fontSize: 11)),
         ],
@@ -207,28 +214,41 @@ class _Ritual extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: AppCard(
         borderColor: alert ? MC.terracotta : null,
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            IconBubble(
-              background: alert ? MC.terraLight : MC.sage,
-              child: Icon(icon, color: alert ? MC.terraDark : MC.olive),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconBubble(
+                  background: alert ? MC.terraLight : MC.sage,
+                  child: Icon(icon, color: alert ? MC.terraDark : MC.olive),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                      if (detail != null)
+                        Text(detail!, style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.3)),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                  if (detail != null)
-                    Text(detail!, style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.3)),
-                ],
+            const SizedBox(height: 8),
+            // El botón va debajo del texto para que nunca le quite ancho.
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton(
+                onPressed: onPressed,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, 44),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                ),
+                child: Text(button),
               ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: onPressed,
-              style: FilledButton.styleFrom(minimumSize: const Size(0, 44), padding: const EdgeInsets.symmetric(horizontal: 14)),
-              child: Text(button),
             ),
           ],
         ),

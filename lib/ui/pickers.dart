@@ -35,3 +35,51 @@ Future<String?> pickPlant(BuildContext context, WidgetRef ref, {String? selected
     ),
   );
 }
+
+/// Respuestas posibles a «¿Cuándo la regaste por última vez?».
+enum WateredWhen { today, yesterday, fewDays, week, unknown }
+
+/// Fecha aproximada del último riego, o null si no se sabe.
+DateTime? wateredAtFor(WateredWhen w, {DateTime? now}) {
+  final n = now ?? DateTime.now();
+  final noon = DateTime(n.year, n.month, n.day, 12);
+  switch (w) {
+    case WateredWhen.today:
+      return n;
+    case WateredWhen.yesterday:
+      return noon.subtract(const Duration(days: 1));
+    case WateredWhen.fewDays:
+      return noon.subtract(const Duration(days: 3));
+    case WateredWhen.week:
+      return noon.subtract(const Duration(days: 7));
+    case WateredWhen.unknown:
+      return null;
+  }
+}
+
+/// Fichas para elegir cuándo se regó por última vez una planta nueva.
+class WateredWhenChips extends ConsumerWidget {
+  const WateredWhenChips({super.key, required this.value, required this.onChanged});
+
+  final WateredWhen value;
+  final ValueChanged<WateredWhen> onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      children: [
+        for (final w in WateredWhen.values)
+          ChoiceChip(
+            label: Text(s.t('watered.${w.name}')),
+            selected: value == w,
+            selectedColor: MC.sage,
+            backgroundColor: MC.card,
+            onSelected: (_) => onChanged(w),
+          ),
+      ],
+    );
+  }
+}

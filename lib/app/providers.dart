@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content.dart';
+import '../data/models.dart';
 import '../data/store.dart';
+import '../engine/light_map.dart';
+import '../engine/sun_engine.dart';
 import '../services/reminders.dart';
 import '../services/weather_service.dart';
 import 'strings.dart';
@@ -71,4 +74,19 @@ final weatherAlertsProvider = Provider<List<WeatherAlert>>((ref) {
 final reminderPlanProvider = Provider<List<DayReminder>>((ref) {
   final store = ref.watch(storeProvider);
   return planReminders(store, ref.watch(contentProvider));
+});
+
+/// Latitud de referencia cuando no hay ubicación (centro de España e Italia).
+const double fallbackLatitude = 40;
+
+/// Mapa de luz de hoy. Se recalcula cuando cambian los datos.
+final lightMapProvider = Provider<LightMap>((ref) {
+  final store = ref.watch(storeProvider);
+  return LightMap(
+    rooms: List<Room>.of(store.rooms),
+    readings: List<Reading>.of(store.readings),
+    northOffset: store.settings.northOffset,
+    latitude: store.settings.latitude ?? fallbackLatitude,
+    dayOfYear: SunEngine.dayOfYear(DateTime.now()),
+  );
 });

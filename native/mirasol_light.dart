@@ -66,6 +66,15 @@ class MirasolLight {
     }
   }
 
+  /// Corta la medición en curso y apaga el sensor o la cámara.
+  static Future<void> cancelMeasure() async {
+    try {
+      await _method.invokeMethod<void>('cancelMeasure');
+    } on MissingPluginException {
+      // Sin plugin no hay nada que cortar.
+    }
+  }
+
   /// Estima la luz con la cámara durante [seconds] segundos (solo iPhone).
   /// Lanza [PlatformException] si falta el permiso o la cámara no responde.
   static Future<CameraLuxResult?> measureWithCamera({

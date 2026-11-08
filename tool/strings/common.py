@@ -9,6 +9,7 @@ STRINGS = [
  ("common.close", "Cerrar", "Chiudi"),
  ("common.retry", "Reintentar", "Riprova"),
  ("common.not_now", "Ahora no", "Non ora"),
+ ("common.undo", "Deshacer", "Annulla"),
  ("common.add", "Agregar", "Aggiungi"),
  ("common.edit", "Editar", "Modifica"),
  ("common.yes", "Sí", "Sì"),

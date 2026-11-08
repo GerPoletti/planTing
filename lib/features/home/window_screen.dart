@@ -11,7 +11,7 @@ import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../data/store.dart';
 import '../../engine/light_map.dart';
-import '../../engine/light_model.dart';
+import '../../engine/light_assessment.dart';
 import '../../engine/sun_engine.dart';
 import '../../ui/dialogs.dart';
 import '../../ui/theme.dart';
@@ -30,18 +30,44 @@ class WindowScreen extends ConsumerStatefulWidget {
 
 class _WindowScreenState extends ConsumerState<WindowScreen> {
   late final TextEditingController _name;
+  late final TextEditingController _sill;
+  late final TextEditingController _top;
+  late final TextEditingController _width;
 
   @override
   void initState() {
     super.initState();
     final w = ref.read(storeProvider).windowById(widget.windowId);
     _name = TextEditingController(text: w?.name ?? '');
+    _sill = TextEditingController(text: plainNum(w?.sillCm ?? 90));
+    _top = TextEditingController(text: plainNum(w?.topCm ?? 210));
+    _width = TextEditingController(text: plainNum(w?.widthCm ?? 120));
   }
 
   @override
   void dispose() {
-    _name.dispose();
+    for (final c in [_name, _sill, _top, _width]) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  /// Guarda las medidas escritas. El borde de arriba queda sobre el alféizar.
+  void _saveSizes(WindowSpot window) {
+    final sill = parseNum(_sill.text);
+    final top = parseNum(_top.text);
+    final width = parseNum(_width.text);
+    ref.read(storeProvider).updateWindow(window, (w) {
+      if (sill != null) w.sillCm = sill.clamp(0, 300).toDouble();
+      if (top != null) w.topCm = top.clamp(w.sillCm + 10, 400).toDouble();
+      if (width != null) w.widthCm = width.clamp(20, 1000).toDouble();
+    });
+  }
+
+  void _preset(WindowSpot window, double sill, double top) {
+    _sill.text = plainNum(sill);
+    _top.text = plainNum(top);
+    _saveSizes(window);
   }
 
   Future<void> _delete() async {
@@ -136,6 +162,37 @@ class _WindowScreenState extends ConsumerState<WindowScreen> {
           onChanged: (v) => store.updateWindow(window, (w) => w.pos = v),
           onChangeEnd: (_) => store.replaceAllPlants(),
         ),
+        SectionTitle(s.t('window.sizes')),
+        Wrap(
+          spacing: 8,
+          children: [
+            ActionChip(label: Text(s.t('window.preset_window')), onPressed: () => _preset(window, 90, 210)),
+            ActionChip(label: Text(s.t('window.preset_door')), onPressed: () => _preset(window, 0, 220)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            for (final (c, label) in [
+              (_sill, s.t('window.sill_cm')),
+              (_top, s.t('window.top_cm')),
+              (_width, s.t('window.width_cm')),
+            ]) ...[
+              Expanded(
+                child: TextField(
+                  controller: c,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(labelText: label),
+                  onChanged: (_) => _saveSizes(window),
+                ),
+              ),
+              if (c != _width) const SizedBox(width: 8),
+            ],
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(s.t('window.sizes_help'), style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.35)),
+        const SizedBox(height: 14),
         Text(
           s.t('window.obstruction', {'n': window.obstruction.round()}),
           style: const TextStyle(color: MC.muted, fontSize: 13),
@@ -202,7 +259,6 @@ class _WindowScreenState extends ConsumerState<WindowScreen> {
 
   Widget _plantRow(AppStrings s, Content content, LightMap map, PlantItem plant) {
     final species = content.speciesById(plant.speciesId);
-    final dli = map.lightAt(plant.x, plant.y);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: AppCard(
@@ -218,7 +274,13 @@ class _WindowScreenState extends ConsumerState<WindowScreen> {
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
-            if (species != null) verdictTag(s, LightModel.verdict(dli, species.dliMin, species.dliMax)),
+            const SizedBox(width: 8),
+            Flexible(
+              child: assessmentTag(
+                s,
+                assessPlantLight(store: ref.read(storeProvider), map: map, species: species, plant: plant),
+              ),
+            ),
           ],
         ),
       ),
@@ -256,7 +318,7 @@ class _MonthBars extends StatelessWidget {
   Widget build(BuildContext context) {
     final maxValue = math.max(1.0, values.reduce(math.max));
     return SizedBox(
-      height: 96,
+      height: 100,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -275,7 +337,14 @@ class _MonthBars extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(s.monthInitial(m + 1), style: const TextStyle(color: MC.muted, fontSize: 11)),
+                    // Con texto ampliado la inicial se achica en vez de desbordar.
+                    SizedBox(
+                      height: 16,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(s.monthInitial(m + 1), style: const TextStyle(color: MC.muted, fontSize: 11)),
+                      ),
+                    ),
                   ],
                 ),
               ),

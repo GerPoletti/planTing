@@ -14,6 +14,8 @@ public class MirasolLightPlugin: NSObject, FlutterPlugin, AVCaptureVideoDataOutp
     private var saturatedCount = 0
     private var pending: FlutterResult?
     private var startTime = Date()
+    /// Sube con cada medición, para que un temporizador viejo no cierre una nueva.
+    private var generation = 0
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "mirasol_light/method", binaryMessenger: registrar.messenger())
@@ -34,6 +36,9 @@ public class MirasolLightPlugin: NSObject, FlutterPlugin, AVCaptureVideoDataOutp
             let args = call.arguments as? [String: Any]
             let seconds = (args?["seconds"] as? NSNumber)?.doubleValue ?? 5.0
             measure(seconds: seconds, result: result)
+        case "cancelMeasure":
+            cancel()
+            result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -70,11 +75,29 @@ public class MirasolLightPlugin: NSObject, FlutterPlugin, AVCaptureVideoDataOutp
         self.saturatedCount = 0
         self.pending = result
         self.startTime = Date()
+        self.generation += 1
+        let current = self.generation
 
         queue.async { session.startRunning() }
         // El primer segundo se descarta mientras la exposición automática se acomoda.
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds + 1.0) { [weak self] in
-            self?.finish()
+            guard let self = self, self.generation == current else { return }
+            self.finish()
+        }
+    }
+
+    /// Corta la medición en curso: apaga la cámara y responde CANCELLED.
+    private func cancel() {
+        generation += 1
+        queue.async { [weak self] in
+            guard let self = self, let reply = self.pending else { return }
+            self.session?.stopRunning()
+            self.session = nil
+            self.device = nil
+            self.pending = nil
+            DispatchQueue.main.async {
+                reply(FlutterError(code: "CANCELLED", message: "Medición cancelada", details: nil))
+            }
         }
     }
 

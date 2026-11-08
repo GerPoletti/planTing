@@ -22,7 +22,9 @@ class SpeciesScreen extends ConsumerWidget {
     final mine = store.plants.where((p) => p.speciesId == species.id).length;
     final otherNames = species.names(s.lang).skip(1).join(', ');
 
-    Widget info(String label, String value) => AppCard(
+    Widget info(String label, String value) => ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 150),
+          child: AppCard(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,6 +34,7 @@ class SpeciesScreen extends ConsumerWidget {
               Text(value, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
             ],
           ),
+        ),
         );
 
     return PageScaffold(
@@ -51,19 +54,24 @@ class SpeciesScreen extends ConsumerWidget {
           runSpacing: 6,
           children: [
             Tag(s.t('species.place.${species.place}'), color: MC.olive, background: MC.sage),
-            species.toxicToPets
-                ? Tag(s.t('species.toxic'), color: MC.terraDark, background: MC.terraLight)
-                : Tag(s.t('species.safe'), color: MC.olive, background: MC.sage),
+            if (mine > 0) Tag(s.t('collection.acquired'), color: MC.olive, background: MC.sage),
+            if (species.isUnknown)
+              Tag(s.t('species.toxic_unknown'))
+            else if (species.toxicToPets)
+              Tag(s.t('species.toxic'), color: MC.terraDark, background: MC.terraLight)
+            else
+              Tag(s.t('species.safe'), color: MC.olive, background: MC.sage),
           ],
         ),
         const SizedBox(height: 14),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 2.3,
+        // Tarjetas de alto libre: con nombres largos o texto ampliado no se cortan.
+        // La entrada «Todavía no sé qué es» no muestra necesidades: no las hay.
+        if (species.isUnknown)
+          AppCard(child: Text(s.t('light.detail.no_species'), style: const TextStyle(fontSize: 14, height: 1.4)))
+        else
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
             info(
               s.t('species.light'),
@@ -72,7 +80,15 @@ class SpeciesScreen extends ConsumerWidget {
                 'max': s.number(species.dliMax, digits: 0),
               }),
             ),
-            info(s.t('species.water'), s.t('species.water_value', {'n': species.waterDays})),
+            // Sin tierra no hay frecuencia de riego genérica que valga.
+            info(
+              s.t('species.water'),
+              switch (species.medium) {
+                'air' => s.t('species.water_air'),
+                'bark' => s.t('species.water_bark'),
+                _ => s.t('species.water_value', {'n': species.waterDays}),
+              },
+            ),
             info(s.t('species.temp'), '${s.number(species.tempMin, digits: 0)} °C'),
             info(
               s.t('species.humidity'),
@@ -91,6 +107,12 @@ class SpeciesScreen extends ConsumerWidget {
         FilledButton(
           onPressed: () => context.push('/plants/add?species=${species.id}'),
           child: Text(s.t('species.add')),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.push('/where?species=${species.id}'),
+          icon: const Icon(Icons.place_outlined),
+          label: Text(s.t('where.from_species')),
         ),
       ],
     );

@@ -28,6 +28,9 @@ String fold(String s) {
   return b.toString();
 }
 
+/// Identificador de la entrada genérica para plantas sin identificar.
+const String unknownSpeciesId = 'desconocida';
+
 class Species {
   Species(this._j);
 
@@ -42,6 +45,14 @@ class Species {
   double get tempMin => (_j['tempMin'] as num).toDouble();
   double get humidityMin => (_j['humidityMin'] as num).toDouble();
   bool get toxicToPets => _j['toxicToPets'] as bool? ?? false;
+
+  /// Dónde vive: 'soil' (tierra), 'bark' (corteza, orquídeas) o 'air' (sin
+  /// sustrato, como la Tillandsia). Solo con tierra vale la revisión con el dedo.
+  String get medium => _j['medium'] as String? ?? 'soil';
+
+  /// Entrada genérica «Todavía no sé qué es»: no está en la colección y no
+  /// tiene dato de toxicidad.
+  bool get isUnknown => id == unknownSpeciesId;
 
   /// 'draft' mientras los datos no estén verificados con fuentes.
   String get confidence => _j['confidence'] as String? ?? 'draft';
@@ -133,8 +144,27 @@ class Content {
     required this.symptoms,
   });
 
+  /// Especies reales (sin la entrada genérica [unknown]).
   final List<Species> species;
   final List<Pest> pests;
+
+  /// Planta sin identificar: valores intermedios y prudentes para que el riego
+  /// y la luz tengan una referencia hasta saber qué es.
+  static final Species unknown = Species(const {
+    'id': unknownSpeciesId,
+    'scientific': '',
+    'names': {
+      'es': ['Todavía no sé qué es'],
+      'it': ['Non so ancora cos\'è'],
+    },
+    'place': 'indoor',
+    'dliMin': 4,
+    'dliMax': 15,
+    'waterDays': 7,
+    'tempMin': 10,
+    'humidityMin': 40,
+    'confidence': 'draft',
+  });
   final List<Symptom> symptoms;
 
   factory Content.fromJson({
@@ -167,6 +197,7 @@ class Content {
   }
 
   Species? speciesById(String? id) {
+    if (id == unknownSpeciesId) return unknown;
     for (final s in species) {
       if (s.id == id) return s;
     }

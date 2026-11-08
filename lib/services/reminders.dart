@@ -2,6 +2,7 @@ import '../data/content.dart';
 import '../data/models.dart';
 import '../data/store.dart';
 import '../engine/watering.dart';
+import '../data/dates.dart';
 
 /// Lo que vence un día: riegos y tareas de tratamiento.
 class DayReminder {
@@ -28,7 +29,7 @@ DateTime nextWatering(
 }) {
   if (species == null) {
     final interval = plant.careIntervalDays ?? 7;
-    return _day(plant.wateredAt ?? plant.createdAt).add(Duration(days: interval));
+    return addDays(plant.wateredAt ?? plant.createdAt, interval);
   }
   return WateringEngine.nextDue(
     species: species,
@@ -44,11 +45,14 @@ DateTime nextWatering(
 /// pendiente no aparece, y durante el modo viaje no se avisa.
 /// El primer día con avisos (hoy, o el primero después del viaje) reúne también
 /// lo atrasado; los siguientes, solo lo que vence ese día.
+/// Si [skipToday] es true (porque el horario de hoy ya pasó), lo atrasado se
+/// lleva al próximo horario futuro: mañana.
 List<DayReminder> planReminders(
   AppStore store,
   Content content, {
   DateTime? now,
   int days = 14,
+  bool skipToday = false,
 }) {
   final today = _day(now ?? DateTime.now());
   final travelUntil =
@@ -57,12 +61,13 @@ List<DayReminder> planReminders(
   final result = <DayReminder>[];
   var catchUp = true; // el primer día con avisos reúne también lo atrasado
 
-  for (var i = 0; i < days; i++) {
-    final day = today.add(Duration(days: i));
+  for (var i = skipToday ? 1 : 0; i < days; i++) {
+    final day = addDays(today, i);
     if (travelUntil != null && !day.isAfter(travelUntil)) continue;
 
     var waterings = 0;
     for (final plant in store.plants) {
+      if (content.speciesById(plant.speciesId)?.medium == 'air') continue;
       final due = nextWatering(
         plant,
         content.speciesById(plant.speciesId),
@@ -83,3 +88,7 @@ List<DayReminder> planReminders(
   }
   return result;
 }
+
+/// Si el horario del aviso de hoy ([hour]:[minute]) ya pasó en [now].
+bool todaySlotPassed(DateTime now, int hour, int minute) =>
+    !DateTime(now.year, now.month, now.day, hour, minute).isAfter(now);

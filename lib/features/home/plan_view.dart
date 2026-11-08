@@ -198,7 +198,26 @@ class _PlanPainter extends CustomPainter {
       ..strokeWidth = selected ? 3 : 1.5
       ..color = selected ? MC.olive : MC.ink.withValues(alpha: 0.55);
     if (room.exterior) {
-      _dashedRect(canvas, rect, outline);
+      // Pared: línea continua; baranda: guiones; abierto: línea tenue.
+      final corners = {
+        't': (rect.topLeft, rect.topRight),
+        'r': (rect.topRight, rect.bottomRight),
+        'b': (rect.bottomRight, rect.bottomLeft),
+        'l': (rect.bottomLeft, rect.topLeft),
+      };
+      corners.forEach((side, ends) {
+        final (a, b) = ends;
+        switch (room.sideOf(side)) {
+          case SideType.wall:
+            canvas.drawLine(a, b, outline);
+          case SideType.railing:
+            _dashed(canvas, a, b, outline);
+          default:
+            canvas.drawLine(a, b, Paint()
+              ..strokeWidth = 1
+              ..color = outline.color.withValues(alpha: 0.25));
+        }
+      });
     } else {
       canvas.drawRRect(rrect, outline);
     }
@@ -215,24 +234,18 @@ class _PlanPainter extends CustomPainter {
     label.paint(canvas, rect.topLeft + const Offset(7, 5));
   }
 
-  void _dashedRect(Canvas canvas, Rect rect, Paint paint) {
-    void dashed(Offset a, Offset b) {
-      const dash = 7.0;
-      const gap = 5.0;
-      final total = (b - a).distance;
-      final dir = (b - a) / total;
-      var d = 0.0;
-      while (d < total) {
-        final end = math.min(d + dash, total);
-        canvas.drawLine(a + dir * d, a + dir * end, paint);
-        d += dash + gap;
-      }
+  void _dashed(Canvas canvas, Offset a, Offset b, Paint paint) {
+    const dash = 7.0;
+    const gap = 5.0;
+    final total = (b - a).distance;
+    if (total <= 0) return;
+    final dir = (b - a) / total;
+    var d = 0.0;
+    while (d < total) {
+      final end = math.min(d + dash, total);
+      canvas.drawLine(a + dir * d, a + dir * end, paint);
+      d += dash + gap;
     }
-
-    dashed(rect.topLeft, rect.topRight);
-    dashed(rect.topRight, rect.bottomRight);
-    dashed(rect.bottomRight, rect.bottomLeft);
-    dashed(rect.bottomLeft, rect.topLeft);
   }
 
   void _paintWindows(Canvas canvas, Room room, double scale, Offset Function(double, double) pt) {
@@ -240,6 +253,7 @@ class _PlanPainter extends CustomPainter {
       ..color = MC.olive
       ..strokeWidth = 6
       ..strokeCap = StrokeCap.round;
+    if (room.exterior) return; // en exteriores la luz entra por los lados
     for (final w in room.windows) {
       final p = AppStore.windowPoint(room, w);
       final horizontal = w.wall == 't' || w.wall == 'b';

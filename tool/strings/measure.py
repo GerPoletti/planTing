@@ -38,6 +38,7 @@ STRINGS = [
  ("measure.no_location", "Sin ubicación, la estimación diaria es aproximada.", "Senza posizione, la stima giornaliera è approssimativa."),
  ("measure.set_location", "Activar ubicación", "Attiva la posizione"),
  ("measure.save", "Guardar medición", "Salva la misurazione"),
+ ("measure.plant_changed", "Cambiaste de planta: mide de nuevo en su lugar.", "Hai cambiato pianta: misura di nuovo al suo posto.", "Cambiaste de planta: medí de nuevo en su lugar."),
  ("measure.saved", "Medición guardada", "Misurazione salvata"),
  ("measure.again", "Medir de nuevo", "Misura di nuovo"),
  ("measure.source", "Fuente de luz", "Fonte di luce"),

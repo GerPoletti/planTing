@@ -5,34 +5,67 @@ import 'package:go_router/go_router.dart';
 import '../../app/advice.dart';
 import '../../app/labels.dart';
 import '../../app/providers.dart';
+import '../../data/content.dart';
 import '../../data/models.dart';
-import '../../engine/light_model.dart';
+import '../../engine/light_assessment.dart';
 import '../../ui/theme.dart';
 import '../../ui/verdict.dart';
 import '../../ui/widgets.dart';
 
 /// Jardín: todas las plantas, con su luz, su próximo riego y si están en tratamiento.
-class GardenScreen extends ConsumerWidget {
+class GardenScreen extends ConsumerStatefulWidget {
   const GardenScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GardenScreen> createState() => _GardenScreenState();
+}
+
+class _GardenScreenState extends ConsumerState<GardenScreen> {
+  String _query = '';
+
+  @override
+  Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
     final store = ref.watch(storeProvider);
     final content = ref.watch(contentProvider);
-    final plants = List<PlantItem>.of(store.plants)
+    final all = List<PlantItem>.of(store.plants)
       ..sort((a, b) => plantName(a, content, s.lang).compareTo(plantName(b, content, s.lang)));
+    // Búsqueda por apodo, especie o ambiente, sin importar acentos.
+    final q = fold(_query.trim());
+    final plants = q.isEmpty
+        ? all
+        : all.where((p) {
+            final species = content.speciesById(p.speciesId);
+            return [
+              p.nickname,
+              species?.name(s.lang) ?? '',
+              species?.scientific ?? '',
+              store.roomById(p.roomId)?.name ?? '',
+            ].any((t) => fold(t).contains(q));
+          }).toList();
 
     return PageScaffold(
       title: s.t('garden.title'),
-      subtitle: s.plural('garden.count', plants.length),
+      subtitle: s.plural('garden.count', all.length),
       bottom: FilledButton.icon(
         onPressed: () => context.push('/plants/add'),
         icon: const Icon(Icons.add),
         label: Text(s.t('garden.add')),
       ),
       children: [
-        if (plants.isEmpty)
+        if (all.length > 5)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: TextField(
+              onChanged: (v) => setState(() => _query = v),
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search, color: MC.muted),
+                hintText: s.t('garden.search'),
+              ),
+            ),
+          ),
+        if (all.isEmpty)
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,14 +94,13 @@ class _PlantCard extends ConsumerWidget {
     final content = ref.watch(contentProvider);
     final species = content.speciesById(plant.speciesId);
     final room = store.roomById(plant.roomId);
-    final readings = store.readingsFor(plant.id);
     final advice = wateringAdviceFor(ref, plant);
     final treatments = store.treatmentsFor(plant.id, onlyActive: true);
 
-    Widget lightTag = Tag(s.t('garden.not_measured'), color: MC.muted, background: MC.sand);
-    if (species != null && readings.isNotEmpty) {
-      lightTag = verdictTag(s, LightModel.verdict(readings.first.dli, species.dliMin, species.dliMax));
-    }
+    final lightTag = assessmentTag(
+      s,
+      assessPlantLight(store: store, map: ref.watch(lightMapProvider), species: species, plant: plant),
+    );
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),

@@ -9,6 +9,7 @@ import '../../app/strings.dart';
 import '../../data/content.dart';
 import '../../services/compass_service.dart';
 import '../../services/location_service.dart';
+import '../../ui/pickers.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 import 'species_picker.dart';
@@ -34,7 +35,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String? _cityMessage;
   bool _searching = false;
   List<ApproxLocation> _cityResults = [];
-  String? _plantId;
+  WateredWhen _watered = WateredWhen.unknown;
+  bool _done = false;
 
   final TextEditingController _city = TextEditingController();
   final TextEditingController _nickname = TextEditingController();
@@ -109,8 +111,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     });
   }
 
-  /// Crea el ambiente, la ventana y la planta con lo elegido.
-  void _createHome() {
+  /// Crea el ambiente, la ventana y la planta con lo elegido. Se llama una sola
+  /// vez, al terminar: si se cierra la app a mitad de camino no queda nada a
+  /// medias ni duplicado.
+  String? _createHome() {
+    final species = _species;
+    if (species == null) return null;
     final store = ref.read(storeProvider);
     final s = ref.read(stringsProvider);
     final exterior = _roomKey == 'balcony';
@@ -122,23 +128,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       w: 4,
       h: exterior ? 2 : 3,
     );
-    store.addWindow(room, name: s.t('onb.window_name'), wall: 't');
-    // La pared de arriba del plano mira hacia donde mira la ventana.
-    store.updateSettings((st) => st.northOffset = _azimuth);
-    final plant = store.addPlant(speciesId: _species!.id, x: room.w / 2, y: 0.9);
-    _plantId = plant.id;
-    setState(() => _step = 2);
+    // Un balcón recibe luz por su lado abierto (arriba en el plano, con
+    // baranda); un ambiente interior, por su ventana.
+    if (!exterior) store.addWindow(room, name: s.t('onb.window_name'), wall: 't');
+    final spot = store.freeSpot(room);
+    final plant = store.addPlant(
+      speciesId: species.id,
+      nickname: _nickname.text.trim(),
+      x: spot.dx,
+      y: spot.dy,
+      wateredAt: wateredAtFor(_watered),
+    );
+    // La pared de arriba del plano mira hacia donde mira la ventana, y el
+    // primer uso queda terminado en el mismo cambio.
+    store.updateSettings((st) {
+      st.northOffset = _azimuth;
+      st.onboardingDone = true;
+    });
+    return plant.id;
   }
 
   void _finish({required bool measure}) {
-    final store = ref.read(storeProvider);
-    final id = _plantId;
-    final name = _nickname.text.trim();
-    if (id != null && name.isNotEmpty) {
-      final plant = store.plantById(id);
-      if (plant != null) store.updatePlant(plant, (p) => p.nickname = name);
-    }
-    store.updateSettings((st) => st.onboardingDone = true);
+    if (_done) return;
+    _done = true;
+    final id = _createHome();
     context.go(measure && id != null ? '/measure?plant=$id' : '/');
   }
 
@@ -209,7 +222,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: Text(s.t('common.back')),
             ),
             const SizedBox(width: 8),
-            Expanded(child: FilledButton(onPressed: _createHome, child: Text(s.t('common.continue')))),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => setState(() => _step = 2),
+                child: Text(s.t('common.continue')),
+              ),
+            ),
           ],
         );
       default:
@@ -247,7 +265,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               const Icon(Icons.photo_camera_outlined, color: MC.muted),
               const SizedBox(width: 12),
               Expanded(child: Text(s.t('onb.plant.photo'))),
-              Tag(s.t('onb.plant.soon')),
+              const SizedBox(width: 8),
+              Flexible(child: Tag(s.t('onb.plant.soon'))),
             ],
           ),
         ),
@@ -447,6 +466,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(labelText: s.t('onb.name.field')),
       ),
+      const SizedBox(height: 16),
+      Text(s.t('watered.title'), style: const TextStyle(fontWeight: FontWeight.w700)),
+      const SizedBox(height: 8),
+      WateredWhenChips(value: _watered, onChanged: (w) => setState(() => _watered = w)),
       const SizedBox(height: 14),
       Align(
         alignment: Alignment.centerLeft,

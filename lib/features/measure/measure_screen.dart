@@ -23,9 +23,17 @@ enum _Phase { idle, measuring, result, saturated, failed }
 
 /// Medidor de luz: dial, medición de 5 segundos, resultado y guardado.
 class MeasureScreen extends ConsumerStatefulWidget {
-  const MeasureScreen({super.key, this.plantId});
+  const MeasureScreen({super.key, this.plantId, this.probeX, this.probeY, this.probeHeightCm});
 
   final String? plantId;
+
+  /// Si se indica un punto del plano, es una medición de prueba en otro lugar:
+  /// sirve para el mapa de luz pero no cambia la luz actual de la planta.
+  final double? probeX;
+  final double? probeY;
+
+  /// Altura del punto de prueba, en cm desde el piso.
+  final double? probeHeightCm;
 
   @override
   ConsumerState<MeasureScreen> createState() => _MeasureScreenState();
@@ -45,6 +53,12 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
   bool _holding = false;
   MeasureError? _error;
   MeasureSession? _session;
+
+  /// Instante en que se tomó la medición que está en pantalla. El resultado se
+  /// calcula y se guarda con esta hora, no con la hora de guardar.
+  DateTime? _capturedAt;
+
+  bool get _probe => widget.probeX != null && widget.probeY != null;
 
   @override
   void initState() {
@@ -105,6 +119,7 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
       return;
     }
     setState(() {
+      _capturedAt = DateTime.now();
       _lux = m.lux;
       _saturated = m.saturated;
       _manual = false;
@@ -124,6 +139,7 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
 
   void _setManual(LightCategory category) {
     setState(() {
+      _capturedAt = DateTime.now();
       _lux = LightModel.manualLux(category);
       _saturated = false;
       _manual = true;
@@ -140,19 +156,22 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
   DliEstimate _estimate() {
     final store = ref.read(storeProvider);
     final st = store.settings;
-    final now = DateTime.now();
+    final now = _capturedAt ?? DateTime.now();
     final lon = st.longitude;
     final solar = lon != null
         ? SunEngine.solarHour(now.toUtc(), lon)
         : now.hour + now.minute / 60;
+    final plant = store.plantById(_plantId);
     return LightModel.estimate(
       lux: _lux,
       source: _source,
       latitude: st.latitude ?? 40,
       dayOfYear: SunEngine.dayOfYear(now),
       solarHour: solar,
-      earlierPeaksToday:
-          _plantId == null || _manual ? const [] : store.peaksOfDay(_plantId!, now),
+      earlierPeaksToday: _plantId == null || _manual || _probe
+          ? const []
+          : store.peaksOfDay(_plantId!, now),
+      artificialHours: (plant?.lampHours ?? 12).toDouble(),
     );
   }
 
@@ -165,17 +184,21 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
     store.addReading(Reading(
       id: newId(),
       plantId: plantId,
-      at: DateTime.now(),
+      at: _capturedAt ?? DateTime.now(),
       lux: _lux,
       source: _source.name,
       ppfd: e.ppfd,
       dli: e.dli,
-      peakPpfd: e.peakPpfd,
+      // Se guarda el pico de esta medición sola; el promedio del día se
+      // vuelve a calcular con peaksOfDay.
+      peakPpfd: e.measurementPeak,
       sunFraction: e.sunFraction,
-      x: plant.x,
-      y: plant.y,
+      x: _probe ? widget.probeX : plant.x,
+      y: _probe ? widget.probeY : plant.y,
       saturated: _saturated,
       manual: _manual,
+      probe: _probe,
+      heightCm: _probe ? (widget.probeHeightCm ?? plant.heightCm) : plant.heightCm,
     ));
     final s = ref.read(stringsProvider);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('measure.saved'))));
@@ -217,12 +240,39 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
         ),
       ),
     );
-    if (picked != null) setState(() => _plantId = picked);
+    if (picked == null || picked == _plantId || !mounted) return;
+    if (_phase == _Phase.measuring) {
+      // La sesión en curso pertenece a la planta anterior: se corta y hay que
+      // empezar otra en el lugar de la nueva.
+      _session?.cancel();
+      _session = null;
+      setState(() {
+        _plantId = picked;
+        _phase = _Phase.idle;
+        _capturedAt = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('measure.plant_changed'))));
+      return;
+    }
+    final hadResult = _phase == _Phase.result || _phase == _Phase.saturated;
+    setState(() {
+      _plantId = picked;
+      // Una medición pertenece al lugar donde se tomó: con otra planta hay que
+      // volver a medir.
+      if (hadResult) {
+        _phase = _Phase.idle;
+        _capturedAt = null;
+        _showNumbers = false;
+      }
+    });
+    if (hadResult) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('measure.plant_changed'))));
+    }
   }
 
   Future<void> _askLocation() async {
-    final result = await requestLocation(context, ref);
-    if (result == LocationAsk.saved && mounted) setState(() {});
+    final saved = await askLocation(context, ref);
+    if (saved && mounted) setState(() {});
   }
 
   // ------------------------------------------------------------ pantalla
@@ -250,6 +300,14 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
           padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
           children: [
             _plantChip(s, store, content, plant),
+            if (_probe)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: AppCard(
+                  color: MC.sage,
+                  child: Text(s.t('measure.probe_note'), style: const TextStyle(fontSize: 13, height: 1.4)),
+                ),
+              ),
             const SizedBox(height: 14),
             LightDial(
               fraction: _phase == _Phase.saturated
@@ -462,7 +520,14 @@ class _MeasureScreenState extends ConsumerState<MeasureScreen> {
     final hasLocation = store.settings.latitude != null;
 
     String? verdictText;
-    if (species != null && plant != null) {
+    // Solo hay veredicto si la lectura permite estimar el día: con el sol muy
+    // bajo (o de noche) la proyección no es confiable.
+    if (species != null &&
+        !species.isUnknown &&
+        plant != null &&
+        !_saturated &&
+        !_manual &&
+        e.measuredAtGoodTime) {
       final v = LightModel.verdict(e.dli, species.dliMin, species.dliMax);
       final key = v == LightVerdict.low
           ? 'measure.verdict.low'

@@ -52,6 +52,24 @@ class WeatherSnapshot {
   final double? currentHumidity;
   final List<WeatherDay> days;
 
+  /// Pronóstico del día de [now], o null si la copia guardada ya no lo tiene.
+  WeatherDay? dayOf(DateTime now) {
+    for (final d in days) {
+      if (d.date.year == now.year && d.date.month == now.month && d.date.day == now.day) {
+        return d;
+      }
+    }
+    return null;
+  }
+
+  /// Días desde hoy en adelante (descarta los ya pasados de una copia vieja).
+  List<WeatherDay> daysFrom(DateTime now) {
+    final today = DateTime(now.year, now.month, now.day);
+    return days
+        .where((d) => !DateTime(d.date.year, d.date.month, d.date.day).isBefore(today))
+        .toList();
+  }
+
   /// Interpreta la respuesta de la API de Open-Meteo.
   factory WeatherSnapshot.fromOpenMeteo(
     Map<String, dynamic> json,
@@ -141,9 +159,10 @@ List<WeatherAlert> computeWeatherAlerts(
   List<ExteriorPlant> exteriorPlants, {
   double heatThreshold = 35,
   double rainThresholdMm = 5,
+  DateTime? now,
 }) {
   final alerts = <WeatherAlert>[];
-  for (final day in weather.days.take(3)) {
+  for (final day in weather.daysFrom(now ?? DateTime.now()).take(3)) {
     final cold = exteriorPlants.where((p) => day.min < p.tempMin).toList();
     if (cold.isNotEmpty) {
       alerts.add(WeatherAlert(

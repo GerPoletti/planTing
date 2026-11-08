@@ -5,7 +5,6 @@ import 'package:plantapp/data/content.dart';
 import 'package:plantapp/data/models.dart';
 import 'package:plantapp/data/store.dart';
 import 'package:plantapp/engine/light_map.dart';
-import 'package:plantapp/engine/light_model.dart';
 import 'package:plantapp/engine/sun_engine.dart';
 
 const double _lat = 45.5;
@@ -41,6 +40,7 @@ LightMap _map(List<Reading> readings, {double north = 0}) => LightMap(
       northOffset: north,
       latitude: _lat,
       dayOfYear: _june21,
+      now: DateTime(2026, 6, 22), // vigencia de las mediciones fija para la prueba
     );
 
 void main() {
@@ -51,7 +51,7 @@ void main() {
     expect(windowAzimuth(WindowSpot(id: 'b', name: '', wall: 't'), 180), 180);
   });
 
-  test('el DLI junto a la ventana sale de sus horas de sol', () {
+  test('las horas de sol de la ventana salen de su orientación', () {
     final map = _map([]);
     final hours = SunEngine.sunHours(
       const WindowGeometry(azimuth: 270, obstruction: 10),
@@ -59,21 +59,88 @@ void main() {
       _june21,
     );
     expect(map.sunHoursOf('w1'), closeTo(hours, 1e-9));
-    final expected = LightModel.windowDli(
-      sunHours: hours,
-      dayLength: SunEngine.dayLength(_lat, _june21),
-      exterior: false,
-    );
-    expect(map.windowDliOf('w1'), closeTo(expected, 1e-9));
-    expect(map.lightAt(0, 2), closeTo(expected, 1e-9));
+    expect(map.windowDliOf('w1'), greaterThan(0));
   });
 
   test('la luz cae con la distancia a la ventana', () {
     final map = _map([]);
-    final atWindow = map.lightAt(0, 2);
-    expect(map.lightAt(1.3, 2), closeTo(atWindow * 0.5, 1e-6));
-    expect(map.lightAt(4, 2), lessThan(map.lightAt(1, 2)));
+    expect(map.lightAt(0.3, 2), greaterThan(map.lightAt(1.3, 2)));
+    expect(map.lightAt(1.3, 2), greaterThan(map.lightAt(4, 2)));
+    expect(map.lightAt(4, 2), greaterThan(0));
     expect(map.lightAt(50, 50), 0); // fuera de la casa
+  });
+
+  test('cerca de la ventana, una maceta en el suelo recibe menos que en una mesa', () {
+    final map = _map([]);
+    final floor = map.lightAt(0.3, 2, heightCm: 0);
+    final table = map.lightAt(0.3, 2, heightCm: 75);
+    expect(floor, lessThan(table));
+    expect(map.sunHoursAt(0.3, 2, heightCm: 0), lessThanOrEqualTo(map.sunHoursAt(0.3, 2, heightCm: 75)));
+  });
+
+  test('una ventana más alta deja entrar el sol más adentro', () {
+    Room withTop(double topCm) => Room(
+          id: 'r1', name: 'S', x: 0, y: 0, w: 5, h: 4,
+          windows: [WindowSpot(id: 'w', name: '', wall: 't', obstruction: 0, topCm: topCm)],
+        );
+    LightMap mapOf(double topCm) => LightMap(
+          rooms: [withTop(topCm)], readings: const [], northOffset: 180,
+          latitude: _lat, dayOfYear: 355, // invierno, ventana al sur
+        );
+    expect(
+      mapOf(300).sunHoursAt(2.5, 2.5, heightCm: 75),
+      greaterThanOrEqualTo(mapOf(150).sunHoursAt(2.5, 2.5, heightCm: 75)),
+    );
+    expect(mapOf(210).sunHoursAt(2.5, 1.5, heightCm: 75), greaterThan(0));
+  });
+
+  group('espacios exteriores', () {
+    Room space(String kind, {bool? covered}) => Room(
+          id: 'e', name: 'E', kind: kind, covered: covered,
+          x: 0, y: 0, w: 4, h: 2, skyObstruction: 10,
+        );
+    LightMap mapOf(Room r, {int day = _june21}) => LightMap(
+          rooms: [r], readings: const [], northOffset: 180, // arriba mira al sur
+          latitude: _lat, dayOfYear: day,
+        );
+
+    test('no necesitan ventanas', () {
+      expect(mapOf(space(RoomKind.garden)).lightAt(2, 1), greaterThan(10));
+    });
+
+    test('un jardín recibe más luz que una terraza y que un balcón techado', () {
+      final garden = mapOf(space(RoomKind.garden)).lightAt(2, 1);
+      final terrace = mapOf(space(RoomKind.terrace)).lightAt(2, 1, heightCm: 0);
+      final balcony = mapOf(space(RoomKind.balcony)).lightAt(2, 1.6, heightCm: 0);
+      expect(garden, greaterThanOrEqualTo(terrace));
+      expect(terrace, greaterThan(balcony));
+    });
+
+    test('el techo tapa el sol alto del verano', () {
+      final open = mapOf(space(RoomKind.balcony, covered: false)).sunHoursAt(2, 1.5);
+      final roofed = mapOf(space(RoomKind.balcony, covered: true)).sunHoursAt(2, 1.5);
+      expect(roofed, lessThan(open));
+    });
+
+    test('la baranda da sombra al suelo pero no a una mesa', () {
+      final map = mapOf(space(RoomKind.terrace), day: 355);
+      expect(map.sunHoursAt(2, 0.3, heightCm: 0), lessThan(map.sunHoursAt(2, 0.3, heightCm: 120)));
+    });
+
+    test('los datos viejos de un exterior con ventana quedan abiertos de ese lado', () {
+      final r = Room.fromJson({
+        'id': 'b', 'name': 'Balcón', 'exterior': true,
+        'windows': [
+          {'id': 'w', 'wall': 'b'},
+        ],
+      });
+      expect(r.kind, RoomKind.balcony);
+      expect(r.sideOf('b'), SideType.railing);
+      expect(r.sideOf('t'), SideType.wall);
+      final again = Room.fromJson(r.toJson());
+      expect(again.sides, r.sides);
+      expect(again.covered, r.covered);
+    });
   });
 
   test('una medición mayor a lo previsto sube el ambiente', () {

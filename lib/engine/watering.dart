@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import '../data/content.dart';
+import '../data/dates.dart';
 import '../data/models.dart';
 import '../data/store.dart';
 import 'light_model.dart';
@@ -31,6 +32,11 @@ enum WateringReason {
   scheduleCheck,
   scheduleWait,
   rain,
+  /// No se sabe cuándo fue el último riego.
+  unknownLast,
+
+  /// La especie no está identificada: solo vale lo que dice la tierra.
+  unknownSpecies,
 }
 
 /// Recomendación de riego para una planta.
@@ -52,7 +58,6 @@ class WateringAdvice {
   final MoistureLevel? level;
 }
 
-DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
 
 /// Reglas generales de riego. Son aproximaciones: la revisión de la tierra
 /// manda sobre el calendario.
@@ -104,15 +109,32 @@ class WateringEngine {
     return math.max(1, (species.waterDays * factor).round());
   }
 
-  /// Revisión de humedad posterior al último riego y de menos de una semana.
+  /// Revisión de humedad posterior al último riego, de menos de una semana y
+  /// que no esté en el futuro (un reloj mal puesto no decide el consejo).
   static MoistureReading? _usable(MoistureReading? m, DateTime lastWatered, DateTime now) {
     if (m == null) return null;
     if (!m.at.isAfter(lastWatered)) return null;
-    if (_day(now).difference(_day(m.at)).inDays > 7) return null;
+    if (m.at.isAfter(now.add(const Duration(hours: 1)))) return null;
+    if (daysBetween(m.at, now) > 7) return null;
     return m;
   }
 
-  /// Día estimado del próximo riego.
+  /// Días entre riegos de referencia. La especie sin identificar usa 7 como
+  /// recordatorio para revisar, no como dato de la especie.
+  static int _interval(Species species, PlantItem plant, double? latitude, DateTime now,
+          double lightFactor, bool hot) =>
+      species.isUnknown
+          ? (plant.careIntervalDays ?? 7)
+          : intervalDays(
+              species: species,
+              override: plant.careIntervalDays,
+              latitude: latitude,
+              now: now,
+              lightFactor: lightFactor,
+              hot: hot,
+            );
+
+  /// Día estimado de la próxima revisión de la tierra (día de calendario).
   static DateTime nextDue({
     required Species species,
     required PlantItem plant,
@@ -122,38 +144,35 @@ class WateringEngine {
     double lightFactor = 1,
     bool hot = false,
   }) {
-    final today = _day(now ?? DateTime.now());
+    final instant = now ?? DateTime.now();
     final watered = plant.wateredAt ?? plant.createdAt;
-    final interval = intervalDays(
-      species: species,
-      override: plant.careIntervalDays,
-      latitude: latitude,
-      now: today,
-      lightFactor: lightFactor,
-      hot: hot,
-    );
-    final reading = _usable(moisture, watered, today);
-    if (reading == null) return _day(watered).add(Duration(days: interval));
+    final interval = _interval(species, plant, latitude, instant, lightFactor, hot);
+    final reading = _usable(moisture, watered, instant);
+    if (reading == null) return addDays(watered, interval);
 
-    final base = _day(reading.at);
     final group = groupOf(species);
     switch (reading.level) {
       case MoistureLevel.dry:
-        return base;
+        return dayOf(reading.at);
       case MoistureLevel.drying:
         final days = group == ThirstGroup.succulent
             ? (interval * 0.3).round()
             : (group == ThirstGroup.average ? 1 : 0);
-        return base.add(Duration(days: days));
+        return addDays(reading.at, days);
       case MoistureLevel.moist:
-        return base.add(Duration(days: math.max(1, (interval * 0.4).round())));
+        return addDays(reading.at, math.max(1, (interval * 0.4).round()));
       case MoistureLevel.wet:
-        return base.add(Duration(days: math.max(2, (interval * 0.6).round())));
+        return addDays(reading.at, math.max(2, (interval * 0.6).round()));
     }
   }
 
   /// Qué hacer hoy con el riego de una planta. [recentMoisture] va de la
   /// revisión más nueva a la más vieja.
+  ///
+  /// Solo una revisión reciente de la tierra (de hasta 3 días) puede decir
+  /// «regar». El calendario y el pronóstico de lluvia piden revisar, nunca
+  /// riegan ni suspenden el riego por sí solos. [exterior] debe ser true solo
+  /// si la maceta queda a la lluvia (exterior sin techo).
   static WateringAdvice advise({
     required Species species,
     required PlantItem plant,
@@ -165,7 +184,8 @@ class WateringEngine {
     double lightFactor = 1,
     bool hot = false,
   }) {
-    final today = _day(now ?? DateTime.now());
+    final instant = now ?? DateTime.now();
+    final today = dayOf(instant);
     final watered = plant.wateredAt ?? plant.createdAt;
     final latest = recentMoisture.isEmpty ? null : recentMoisture.first;
     final due = nextDue(
@@ -173,21 +193,13 @@ class WateringEngine {
       plant: plant,
       moisture: latest,
       latitude: latitude,
-      now: today,
+      now: instant,
       lightFactor: lightFactor,
       hot: hot,
     );
 
-    if (exterior && (rainTodayMm ?? 0) >= 5) {
-      return WateringAdvice(
-        action: WateringAction.skipRain,
-        reason: WateringReason.rain,
-        due: today.add(const Duration(days: 1)),
-      );
-    }
-
-    final fresh = _usable(latest, watered, today);
-    if (fresh != null && today.difference(_day(fresh.at)).inDays <= 3) {
+    final fresh = _usable(latest, watered, instant);
+    if (fresh != null && daysBetween(fresh.at, today) <= 3) {
       final group = groupOf(species);
       switch (fresh.level) {
         case MoistureLevel.dry:
@@ -226,9 +238,29 @@ class WateringEngine {
       }
     }
 
-    final days = due.difference(today).inDays;
+    final days = daysBetween(today, due);
+    // Lluvia prevista sobre una maceta a la intemperie: revisar después si
+    // realmente le llegó agua. Un pronóstico no reemplaza la tierra.
+    if (exterior && (rainTodayMm ?? 0) >= 5 && days <= 1) {
+      return WateringAdvice(action: WateringAction.check, reason: WateringReason.rain, due: due);
+    }
+    if (species.isUnknown) {
+      return WateringAdvice(
+        action: days <= 1 ? WateringAction.check : WateringAction.wait,
+        reason: WateringReason.unknownSpecies,
+        due: due.isBefore(today) ? today : due,
+      );
+    }
+    if (plant.wateredAt == null) {
+      // Sin el último riego no hay calendario confiable: mejor tocar la tierra.
+      return WateringAdvice(
+        action: WateringAction.check,
+        reason: WateringReason.unknownLast,
+        due: due.isBefore(today) ? today : due,
+      );
+    }
     if (days <= 0) {
-      return WateringAdvice(action: WateringAction.waterNow, reason: WateringReason.scheduleDue, due: due);
+      return WateringAdvice(action: WateringAction.check, reason: WateringReason.scheduleDue, due: due);
     }
     if (days == 1) {
       return WateringAdvice(action: WateringAction.check, reason: WateringReason.scheduleCheck, due: due);
@@ -239,10 +271,8 @@ class WateringEngine {
   /// Ajuste por la luz que recibe la planta según su última medición.
   static double plantLightFactor(AppStore store, Content content, PlantItem plant) {
     final species = content.speciesById(plant.speciesId);
-    final readings = store.readingsFor(plant.id);
-    if (species == null || readings.isEmpty) return 1;
-    final last = readings.first;
-    if (last.manual || last.saturated) return 1;
+    final last = store.lastPlantReading(plant.id);
+    if (species == null || species.isUnknown || last == null) return 1;
     return lightFactor(LightModel.verdict(last.dli, species.dliMin, species.dliMax));
   }
 }

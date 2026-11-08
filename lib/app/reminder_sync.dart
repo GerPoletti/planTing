@@ -13,7 +13,13 @@ Future<void> syncReminders(AppStore store, Content content, AppStrings s) async 
     await service.cancelAll();
     return;
   }
-  final plan = planReminders(store, content);
+  final now = DateTime.now();
+  final plan = planReminders(
+    store,
+    content,
+    now: now,
+    skipToday: todaySlotPassed(now, settings.reminderHour, settings.reminderMinute),
+  );
   final reminders = <ScheduledReminder>[];
   var id = 100;
   for (final day in plan) {

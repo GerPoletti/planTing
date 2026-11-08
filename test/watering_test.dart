@@ -180,7 +180,7 @@ void main() {
       expect(persistent.reason, WateringReason.drainage);
     });
 
-    test('lluvia fuerte en una planta de exterior: no regar', () {
+    test('lluvia prevista en exterior sin revisión: revisar, no suspender el riego', () {
       final a = WateringEngine.advise(
         species: _species(7),
         plant: _plant(),
@@ -189,25 +189,29 @@ void main() {
         exterior: true,
         rainTodayMm: 8,
       );
-      expect(a.action, WateringAction.skipRain);
-      final indoor = WateringEngine.advise(
+      expect(a.action, WateringAction.check);
+      expect(a.reason, WateringReason.rain);
+      // Una revisión reciente de tierra seca manda sobre el pronóstico.
+      final dry = WateringEngine.advise(
         species: _species(7),
-        plant: _plant(),
+        plant: _plant(watered: DateTime(2026, 6, 14)),
+        recentMoisture: [_m(MoistureLevel.dry, DateTime(2026, 6, 15, 9))],
         latitude: 45,
         now: _now,
+        exterior: true,
         rainTodayMm: 8,
       );
-      expect(indoor.action, isNot(WateringAction.skipRain));
+      expect(dry.action, WateringAction.waterNow);
     });
 
-    test('sin revisión reciente decide el calendario', () {
+    test('sin revisión reciente el calendario pide revisar, nunca regar', () {
       WateringAdvice byCalendar(DateTime watered) => WateringEngine.advise(
             species: _species(7),
             plant: _plant(watered: watered),
             latitude: 45,
             now: _now,
           );
-      expect(byCalendar(DateTime(2026, 6, 8)).action, WateringAction.waterNow);
+      expect(byCalendar(DateTime(2026, 6, 8)).action, WateringAction.check);
       expect(byCalendar(DateTime(2026, 6, 8)).reason, WateringReason.scheduleDue);
       expect(byCalendar(DateTime(2026, 6, 9)).action, WateringAction.check);
       expect(byCalendar(DateTime(2026, 6, 12)).action, WateringAction.wait);

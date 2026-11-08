@@ -15,7 +15,8 @@ class DiscoverScreen extends ConsumerWidget {
     final s = ref.watch(stringsProvider);
     final store = ref.watch(storeProvider);
     final content = ref.watch(contentProvider);
-    final unlocked = store.plants.map((p) => p.speciesId).toSet().length;
+    final owned = store.plants.map((p) => p.speciesId).toSet();
+    final unlocked = content.species.where((sp) => owned.contains(sp.id)).length;
 
     Widget entry(IconData icon, Color bubble, Color color, String title, String sub, String route) {
       return Padding(

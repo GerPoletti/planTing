@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/actions.dart';
 import '../../app/providers.dart';
+import '../../data/backup.dart';
 import '../../services/export_service.dart';
 import '../../services/location_service.dart';
 import '../../services/notification_service.dart';
@@ -87,16 +88,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('settings.wiped'))));
   }
 
+  Future<void> _restore() async {
+    final s = ref.read(stringsProvider);
+    final store = ref.read(storeProvider);
+    final bytes = await ExportService.pickBackup();
+    if (bytes == null || !mounted) return;
+    final ok = await confirmDialog(
+      context,
+      title: s.t('settings.restore'),
+      body: s.t('settings.restore_confirm'),
+      confirmLabel: s.t('settings.restore_go'),
+      cancelLabel: s.t('common.cancel'),
+    );
+    if (!ok || !mounted) return;
+    try {
+      await Backup.restore(store, bytes);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('settings.restored'))));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('settings.restore_failed'))));
+    }
+  }
+
   Future<void> _useLocation() async {
-    await requestLocation(context, ref);
+    await askLocation(context, ref);
   }
 
   Future<void> _searchCity() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => const _CitySheet(),
-    );
+    await showCitySheet(context);
   }
 
   @override
@@ -106,7 +126,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final st = store.settings;
     final time = TimeOfDay(hour: st.reminderHour, minute: st.reminderMinute).format(context);
     final travel = st.travelUntil;
-    final traveling = travel != null && travel.isAfter(DateTime.now());
+    final traveling = st.travelingOn(DateTime.now());
 
     return PageScaffold(
       title: s.t('settings.title'),
@@ -157,7 +177,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                traveling ? s.t('settings.travel_until', {'date': s.date(travel)}) : s.t('settings.travel_off'),
+                traveling ? s.t('settings.travel_until', {'date': s.date(travel!)}) : s.t('settings.travel_off'),
                 style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 8),
@@ -260,10 +280,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             children: [
               Text(s.t('settings.data_note'), style: const TextStyle(fontSize: 14, height: 1.4)),
               const SizedBox(height: 10),
+              if (store.saveFailed)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: AppCard(
+                    color: MC.terraLight,
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: MC.terraDark),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(s.t('settings.save_failed'), style: const TextStyle(fontSize: 13, height: 1.4)),
+                        ),
+                        TextButton(onPressed: store.flush, child: Text(s.t('settings.save_retry'))),
+                      ],
+                    ),
+                  ),
+                ),
               OutlinedButton.icon(
                 onPressed: () => ExportService.share(store),
                 icon: const Icon(Icons.ios_share),
                 label: Text(s.t('settings.export')),
+              ),
+              const SizedBox(height: 6),
+              OutlinedButton.icon(
+                onPressed: _restore,
+                icon: const Icon(Icons.restore),
+                label: Text(s.t('settings.restore')),
               ),
               const SizedBox(height: 4),
               TextButton.icon(
@@ -284,14 +328,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 }
 
 /// Hoja para buscar una ciudad y usarla como ubicación.
-class _CitySheet extends ConsumerStatefulWidget {
-  const _CitySheet();
+/// Abre la búsqueda de ciudad para cargar la ubicación a mano.
+Future<void> showCitySheet(BuildContext context) => showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const CitySheet(),
+    );
+
+/// Búsqueda de ciudad: alternativa a dar permiso de ubicación.
+class CitySheet extends ConsumerStatefulWidget {
+  const CitySheet({super.key});
 
   @override
-  ConsumerState<_CitySheet> createState() => _CitySheetState();
+  ConsumerState<CitySheet> createState() => _CitySheetState();
 }
 
-class _CitySheetState extends ConsumerState<_CitySheet> {
+class _CitySheetState extends ConsumerState<CitySheet> {
   final TextEditingController _controller = TextEditingController();
   List<ApproxLocation> _results = [];
   bool _busy = false;

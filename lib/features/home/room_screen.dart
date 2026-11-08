@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/labels.dart';
 import '../../app/providers.dart';
+import '../../app/strings.dart';
 import '../../data/models.dart';
 import '../../engine/light_map.dart';
 import '../../ui/dialogs.dart';
@@ -30,7 +31,12 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
   late final TextEditingController _h;
   late final TextEditingController _temp;
   late final TextEditingController _hum;
-  bool _exterior = false;
+  late final TextEditingController _wall;
+  late final TextEditingController _railing;
+  String _kind = RoomKind.indoor;
+  Map<String, String> _sides = defaultSides(RoomKind.indoor);
+  bool _covered = false;
+  double _skyObstruction = 15;
 
   @override
   void initState() {
@@ -43,12 +49,30 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     _h = TextEditingController(text: plainNum(room?.h ?? 3));
     _temp = TextEditingController(text: room?.temperature == null ? '' : plainNum(room!.temperature!));
     _hum = TextEditingController(text: room?.humidity == null ? '' : plainNum(room!.humidity!));
-    _exterior = room?.exterior ?? false;
+    _kind = room?.kind ?? RoomKind.indoor;
+    _sides = Map<String, String>.of(room?.sides ?? defaultSides(_kind));
+    _covered = room?.covered ?? false;
+    _skyObstruction = room?.skyObstruction ?? 15;
+    _wall = TextEditingController(text: plainNum(room?.wallCm ?? 270));
+    _railing = TextEditingController(text: plainNum(room?.railingCm ?? 100));
+  }
+
+  /// Al cambiar el tipo se proponen los lados típicos, que después se ajustan.
+  void _setKind(String kind) {
+    setState(() {
+      final wasIndoor = _kind == RoomKind.indoor;
+      _kind = kind;
+      if (kind != RoomKind.indoor) {
+        _sides = defaultSides(kind);
+        _covered = kind == RoomKind.balcony;
+        if (wasIndoor) _skyObstruction = 15;
+      }
+    });
   }
 
   @override
   void dispose() {
-    for (final c in [_name, _x, _y, _w, _h, _temp, _hum]) {
+    for (final c in [_name, _x, _y, _w, _h, _temp, _hum, _wall, _railing]) {
       c.dispose();
     }
     super.dispose();
@@ -63,19 +87,29 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
     store.updateRoom(room, (r) {
       final name = _name.text.trim();
       if (name.isNotEmpty) r.name = name;
-      r.exterior = _exterior;
-      r.x = parseNum(_x.text) ?? r.x;
-      r.y = parseNum(_y.text) ?? r.y;
-      r.w = math.max(1.0, parseNum(_w.text) ?? r.w);
-      r.h = math.max(1.0, parseNum(_h.text) ?? r.h);
+      r.kind = _kind;
+      r.sides
+        ..clear()
+        ..addAll(_sides);
+      r.covered = _covered;
+      r.skyObstruction = _skyObstruction;
+      r.wallCm = (parseNum(_wall.text) ?? r.wallCm).clamp(100, 2000).toDouble();
+      r.railingCm = (parseNum(_railing.text) ?? r.railingCm).clamp(0, 300).toDouble();
     });
+    // Las plantas del ambiente se mueven con él y quedan dentro si se achica.
+    store.moveRoom(
+      room,
+      x: parseNum(_x.text) ?? room.x,
+      y: parseNum(_y.text) ?? room.y,
+      w: math.max(1.0, parseNum(_w.text) ?? room.w),
+      h: math.max(1.0, parseNum(_h.text) ?? room.h),
+    );
+    // Temperatura y humedad son independientes: se puede cargar una sola.
     final t = parseNum(_temp.text);
-    final h = parseNum(_hum.text);
-    if (t != null && (t != room.temperature || h != room.humidity)) {
+    final h = parseNum(_hum.text)?.clamp(0, 100).toDouble();
+    if (t != room.temperature || h != room.humidity) {
       store.saveClimate(room, temperature: t, humidity: h);
     }
-    // Las plantas se reubican según el nuevo tamaño y posición.
-    store.replaceAllPlants();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.t('room.saved'))));
     context.pop();
   }
@@ -122,12 +156,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
           decoration: InputDecoration(labelText: s.t('room.name')),
         ),
         const SizedBox(height: 8),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(s.t('room.exterior')),
-          value: _exterior,
-          onChanged: (v) => setState(() => _exterior = v),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            for (final k in RoomKind.all)
+              ChoiceChip(
+                label: Text(s.t('room.kind.$k')),
+                selected: _kind == k,
+                selectedColor: MC.sage,
+                backgroundColor: MC.card,
+                onSelected: (_) => _setKind(k),
+              ),
+          ],
         ),
+        if (_kind != RoomKind.indoor) ..._outdoorFields(s, store.settings.northOffset),
         SectionTitle(s.t('room.position')),
         Row(
           children: [
@@ -152,18 +195,19 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
             Expanded(child: _numberField(_hum, s.t('room.humidity'))),
           ],
         ),
-        if (room.climateAt != null && room.temperature != null)
+        if (room.climateAt != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               s.t('room.climate_saved', {
-                't': s.number(room.temperature!),
+                't': room.temperature == null ? '–' : s.number(room.temperature!),
                 'h': room.humidity == null ? '–' : s.number(room.humidity!, digits: 0),
                 'when': s.date(room.climateAt!),
               }),
               style: const TextStyle(color: MC.muted, fontSize: 13),
             ),
           ),
+        if (_kind == RoomKind.indoor) ...[
         SectionTitle(s.t('room.windows')),
         for (final w in room.windows)
           Padding(
@@ -200,6 +244,7 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
           icon: const Icon(Icons.add),
           label: Text(s.t('room.add_window')),
         ),
+        ],
         const SizedBox(height: 24),
         TextButton.icon(
           onPressed: () => _delete(room),
@@ -208,6 +253,71 @@ class _RoomScreenState extends ConsumerState<RoomScreen> {
         ),
       ],
     );
+  }
+
+  /// Lados, techo, alturas y alrededores de un espacio exterior.
+  List<Widget> _outdoorFields(AppStrings s, double northOffset) {
+    const wallAngle = {'t': 0.0, 'r': 90.0, 'b': 180.0, 'l': 270.0};
+    return [
+      SectionTitle(s.t('room.sides')),
+      Text(s.t('room.sides_help'), style: const TextStyle(color: MC.muted, fontSize: 13, height: 1.4)),
+      const SizedBox(height: 8),
+      for (final side in planSides)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                s.t('room.side', {
+                  'side': s.t('room.side.$side'),
+                  'dir': directionName(s, (wallAngle[side]! + northOffset) % 360),
+                }),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 4),
+              SegmentedButton<String>(
+                showSelectedIcon: false,
+                segments: [
+                  for (final t in SideType.all)
+                    ButtonSegment(value: t, label: Text(s.t('room.sidetype.$t'))),
+                ],
+                selected: {_sides[side] ?? SideType.wall},
+                onSelectionChanged: (v) => setState(() => _sides[side] = v.first),
+              ),
+            ],
+          ),
+        ),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: Text(s.t('room.covered')),
+        subtitle: Text(s.t('room.covered_help')),
+        value: _covered,
+        onChanged: (v) => setState(() => _covered = v),
+      ),
+      const SizedBox(height: 4),
+      Row(
+        children: [
+          Expanded(child: _numberField(_wall, s.t('room.wall_cm'))),
+          const SizedBox(width: 10),
+          Expanded(child: _numberField(_railing, s.t('room.railing_cm'))),
+        ],
+      ),
+      const SizedBox(height: 12),
+      Text(
+        s.t('room.sky_obstruction', {'deg': _skyObstruction.round()}),
+        style: const TextStyle(fontSize: 14),
+      ),
+      Slider(
+        value: _skyObstruction,
+        min: 0,
+        max: 60,
+        divisions: 12,
+        label: '${_skyObstruction.round()}°',
+        onChanged: (v) => setState(() => _skyObstruction = v),
+      ),
+      Text(s.t('room.sky_obstruction_help'), style: const TextStyle(color: MC.muted, fontSize: 12, height: 1.4)),
+    ];
   }
 
   Widget _numberField(TextEditingController c, String label) {

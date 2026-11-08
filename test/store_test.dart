@@ -80,7 +80,8 @@ void main() {
     final plant = store.addPlant(speciesId: 'potus', wateredAt: DateTime(2026, 1, 1));
     store.addEvent(plant.id, CareType.water);
     expect(plant.wateredAt!.year, DateTime.now().year);
-    expect(store.eventsFor(plant.id).length, 1);
+    // El riego indicado al agregarla también queda en la historia.
+    expect(store.eventsFor(plant.id).length, 2);
   });
 
   test('tratamiento: no duplica y calcula las tareas pendientes', () async {

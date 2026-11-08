@@ -55,6 +55,9 @@ R = [
 ("lavandula_angustifolia","Lavandula angustifolia",["Lavanda"],["Lavanda"],"both",20,35,10,-5,25,True),
 ]
 
+# Medio de cultivo distinto de la tierra: cambia cómo se revisa la humedad.
+MEDIUM = {"tillandsia": "air", "phalaenopsis": "bark"}
+
 species = []
 for (i, sci, es, it, place, dmin, dmax, water, tmin, hmin, toxic) in R:
     species.append({
@@ -64,6 +67,7 @@ for (i, sci, es, it, place, dmin, dmax, water, tmin, hmin, toxic) in R:
         "dliMin": dmin, "dliMax": dmax,
         "waterDays": water, "tempMin": tmin, "humidityMin": hmin,
         "toxicToPets": toxic,
+        "medium": MEDIUM.get(i, "soil"),
         "confidence": "draft",
     })
 OUT.write_text(json.dumps({"version": 1, "species": species}, ensure_ascii=False, indent=1), encoding="utf-8")
